@@ -18,6 +18,16 @@ El TB1 exige que la landing esté **desplegada y accesible públicamente**. Hay 
    ```
 5. Copia esa URL al informe TB1 (sección 5.2.1.4 Software Deployment Evidence).
 
+### Tu URL esperada (repo `yagocz/YaQuedo_TetraDev`)
+
+```
+https://yagocz.github.io/YaQuedo_TetraDev/
+```
+
+Páginas legales:
+- Términos: `https://yagocz.github.io/YaQuedo_TetraDev/terms.html`
+- Privacidad: `https://yagocz.github.io/YaQuedo_TetraDev/privacy.html`
+
 ## Opción B — Netlify (despliegue más rápido, sin workflow)
 
 1. Entra a [https://app.netlify.com/start](https://app.netlify.com/start).
@@ -45,7 +55,8 @@ Después del despliegue revisa:
 
 | Producto | URL pública |
 |---|---|
-| Landing Page | `https://...` (tras deploy) |
-| Repo Landing | `https://github.com/BlackAmnesiac/Ya-quedo-by-TetraDev` |
+| Landing Page (yagocz) | `https://yagocz.github.io/YaQuedo_TetraDev/` |
+| Repo Landing | `https://github.com/yagocz/YaQuedo_TetraDev` |
+| Repo mirror (upstream) | `https://github.com/BlackAmnesiac/Ya-quedo-by-TetraDev` |
 | Repo Web App (Angular, TB2+) | pendiente |
 | Repo Web Services (Spring Boot, TB2+) | pendiente |
