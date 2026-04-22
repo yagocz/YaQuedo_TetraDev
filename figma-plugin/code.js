@@ -1815,41 +1815,49 @@
     });
 
     // =========================================================================
-    // 11) PAGES — organización de todo el archivo Figma en páginas
+    // 11) LAYOUT ÚNICO — todo en Page 1 con coordenadas globales
+    // (Free plan limita a 3 páginas. Esta versión organiza todo en una sola página
+    // con offsets horizontales para cada sección.)
     // =========================================================================
-    function ensurePage(name) {
-        for (var i = 0; i < figma.root.children.length; i++) {
-            if (figma.root.children[i].name === name) return figma.root.children[i];
-        }
-        var p = figma.createPage();
-        p.name = name;
-        return p;
-    }
+    var currentPg = figma.currentPage;
 
-    var pCover    = ensurePage('📐 Cover');
-    var pDS       = ensurePage('🎨 Design System');
-    var pComps    = ensurePage('🧩 Components');
-    var pDLand    = ensurePage('🖥 Desktop · Landing');
-    var pMLand    = ensurePage('📱 Mobile · Landing');
-    var pWF       = ensurePage('📝 Wireframes Lo-Fi');
-    var pIA       = ensurePage('🗺 Information Architecture');
-    var pSM       = ensurePage('🧭 Site Map');
-    var pFlows    = ensurePage('🔀 User Flows');
-    var pAppD     = ensurePage('🖥 App · Desktop');
-    var pAppM     = ensurePage('📱 App · Mobile');
+    // ensurePage devuelve siempre currentPage (compatibilidad con código más abajo)
+    function ensurePage(name) { return currentPg; }
 
-    // Mover frames existentes a sus páginas
-    pDLand.appendChild(landing);
-    pMLand.appendChild(mobile);
-    pComps.appendChild(btnPrimaryCmp);
-    pComps.appendChild(btnSecondaryCmp);
-    pComps.appendChild(navbarCmp);
-    pComps.appendChild(navbarMobile);
+    var pCover = currentPg, pDS = currentPg, pComps = currentPg;
+    var pDLand = currentPg, pMLand = currentPg, pWF = currentPg;
+    var pIA = currentPg, pSM = currentPg, pFlows = currentPg;
+    var pAppD = currentPg, pAppM = currentPg;
+
+    // Offsets horizontales globales (en px). Cada zona tiene su carril.
+    var OFF_LANDING_D = 0;
+    var OFF_LANDING_M = 1600;
+    var OFF_COVER     = 2100;
+    var OFF_IA        = 3800;
+    var OFF_SITEMAP   = 6500;
+    var OFF_FLOWS     = 9200;
+    var OFF_WF        = 11800;
+    var OFF_APPD      = 13500;
+    var OFF_APPM      = 19700;
+
+    // Las instancias existentes se quedan donde están (currentPage auto-adoptó landing y mobile)
+    // pero queremos asegurar que estén en la página, por si acaso
+    currentPg.appendChild(landing);
+    currentPg.appendChild(mobile);
+    currentPg.appendChild(btnPrimaryCmp);
+    currentPg.appendChild(btnSecondaryCmp);
+    currentPg.appendChild(navbarCmp);
+    currentPg.appendChild(navbarMobile);
+
+    // Los componentes a su posición propia (arriba-izquierda, carril componentes)
+    btnPrimaryCmp.x = OFF_COVER; btnPrimaryCmp.y = -1400;
+    btnSecondaryCmp.x = OFF_COVER + 220; btnSecondaryCmp.y = -1400;
+    navbarCmp.x = OFF_COVER; navbarCmp.y = -1300;
+    navbarMobile.x = OFF_COVER; navbarMobile.y = -1200;
 
     // =========================================================================
     // 12) COVER — página de portada
     // =========================================================================
-    figma.currentPage = pCover;
     var cover = makeFrame(null, {
         name: 'Cover', w: 1440, h: 900,
         bgGradient: ['#667EEA', '#764BA2', 135],
@@ -1857,6 +1865,7 @@
         primaryAlign: 'CENTER', counterAlign: 'CENTER',
         gap: 24, primarySizing: 'FIXED', counterSizing: 'FIXED'
     });
+    cover.x = OFF_COVER; cover.y = 0;
     var coverLogo = makeFrame(cover, {
         bg: '#FFFFFF', radius: 72,
         w: 144, h: 144,
@@ -1886,7 +1895,6 @@
     // =========================================================================
     // 13) DESIGN SYSTEM — swatches visuales
     // =========================================================================
-    figma.currentPage = pDS;
     var dsCanvas = makeFrame(null, {
         name: 'Design System Overview',
         w: 1440, h: 1800,
@@ -1895,6 +1903,7 @@
         padding: 64, gap: 48,
         primarySizing: 'FIXED', counterSizing: 'FIXED'
     });
+    dsCanvas.x = OFF_COVER; dsCanvas.y = 1000;
     makeText(dsCanvas, 'Design System · Ya Quedó', { size: 48, weight: 'Extra Bold', color: '#1F2937' });
     makeText(dsCanvas, 'Tokens, tipografía, colores y sombras del producto', { size: 18, weight: 'Regular', color: '#6B7280' });
 
@@ -2024,7 +2033,6 @@
     // =========================================================================
     // 14) COMPONENTS SHOWCASE — vista catalogada de los componentes
     // =========================================================================
-    figma.currentPage = pComps;
     var compsCanvas = makeFrame(null, {
         name: 'Components Showcase',
         w: 1440, h: 900,
@@ -2033,7 +2041,7 @@
         padding: 64, gap: 32,
         primarySizing: 'FIXED', counterSizing: 'FIXED'
     });
-    compsCanvas.x = 2000; // al lado de los componentes
+    compsCanvas.x = OFF_COVER; compsCanvas.y = 2900;
     makeText(compsCanvas, 'Componentes', { size: 40, weight: 'Extra Bold', color: '#1F2937' });
     makeText(compsCanvas, 'Usa las instancias desde el panel Assets', { size: 15, weight: 'Regular', color: '#6B7280' });
     var compsRow = makeFrame(compsCanvas, {
@@ -2052,8 +2060,7 @@
     // =========================================================================
     // 15) INFORMATION ARCHITECTURE — 4 diagramas (el site map es aparte)
     // =========================================================================
-    figma.currentPage = pIA;
-
+    // IA en un carril propio con offset OFF_IA
     // Helper: caja de diagrama
     function iaBox(parent, label, w, h, bg, textColor) {
         var bx = makeFrame(parent, {
@@ -2083,7 +2090,7 @@
     }
 
     // 4.2.1 Organization Systems
-    var iaOrg = iaDiagramFrame('4.2.1 · Organization Systems', 1200, 900, 0, 0);
+    var iaOrg = iaDiagramFrame('4.2.1 · Organization Systems', 1200, 900, OFF_IA, 0);
     makeText(iaOrg, '4.2.1 · Organization Systems', { size: 28, weight: 'Bold', color: '#1F2937' });
     makeText(iaOrg, 'Esquemas de organización de contenido: por audiencia, por tarea y por tema', { size: 14, weight: 'Regular', color: '#6B7280' });
     var iaOrgRoot = makeFrame(iaOrg, {
@@ -2141,7 +2148,7 @@
     }
 
     // 4.2.2 Labeling Systems
-    var iaLab = iaDiagramFrame('4.2.2 · Labeling Systems', 1200, 900, 1300, 0);
+    var iaLab = iaDiagramFrame('4.2.2 · Labeling Systems', 1200, 900, OFF_IA + 1300, 0);
     makeText(iaLab, '4.2.2 · Labeling Systems', { size: 28, weight: 'Bold', color: '#1F2937' });
     makeText(iaLab, 'Etiquetas consistentes en español (es-419) e inglés (en-US)', { size: 14, weight: 'Regular', color: '#6B7280' });
     var labTable = makeFrame(iaLab, {
@@ -2209,7 +2216,7 @@
     }
 
     // 4.2.3 Searching Systems
-    var iaSrch = iaDiagramFrame('4.2.3 · Searching Systems', 1200, 900, 0, 1000);
+    var iaSrch = iaDiagramFrame('4.2.3 · Searching Systems', 1200, 900, OFF_IA, 1000);
     makeText(iaSrch, '4.2.3 · Searching Systems', { size: 28, weight: 'Bold', color: '#1F2937' });
     makeText(iaSrch, 'Búsqueda global (topbar) + filtros facetados (results)', { size: 14, weight: 'Regular', color: '#6B7280' });
     // Flujo: topbar search → autocomplete → results + filters
@@ -2256,7 +2263,7 @@
     }
 
     // 4.2.4 Navigation Systems
-    var iaNav = iaDiagramFrame('4.2.4 · Navigation Systems', 1200, 900, 1300, 1000);
+    var iaNav = iaDiagramFrame('4.2.4 · Navigation Systems', 1200, 900, OFF_IA + 1300, 1000);
     makeText(iaNav, '4.2.4 · Navigation Systems', { size: 28, weight: 'Bold', color: '#1F2937' });
     makeText(iaNav, 'Navbar público + Topbar app + Sidenav desktop + Bottom nav mobile', { size: 14, weight: 'Regular', color: '#6B7280' });
     var navCol = makeFrame(iaNav, {
@@ -2375,7 +2382,6 @@
     // =========================================================================
     // 16) SITE MAP — árbol jerárquico
     // =========================================================================
-    figma.currentPage = pSM;
     var smCanvas = makeFrame(null, {
         name: '4.2.5 · Site Map',
         w: 2400, h: 1400,
@@ -2384,6 +2390,7 @@
         padding: 48, gap: 32,
         primarySizing: 'FIXED', counterSizing: 'FIXED'
     });
+    smCanvas.x = OFF_SITEMAP; smCanvas.y = 0;
     makeText(smCanvas, '4.2.5 · Site Map', { size: 40, weight: 'Extra Bold', color: '#1F2937' });
     makeText(smCanvas, 'Jerarquía completa de páginas y vistas', { size: 16, weight: 'Regular', color: '#6B7280' });
 
@@ -2483,8 +2490,7 @@
     // =========================================================================
     // 17) USER FLOWS — 8 diagramas con happy + unhappy paths
     // =========================================================================
-    figma.currentPage = pFlows;
-
+    // User Flows con offset OFF_FLOWS en carril horizontal propio
     function flowStep(parent, label, kind) {
         // kind: 'screen' (blue), 'decision' (yellow), 'end' (green)
         var bg = '#E0E7FF', color = '#4F46E5';
@@ -2658,7 +2664,7 @@
 
     for (var fi = 0; fi < flowsData.length; fi++) {
         var col = fi % 2, rowF = Math.floor(fi / 2);
-        var fx = col * 1300, fy = rowF * 1000;
+        var fx = OFF_FLOWS + col * 1300, fy = rowF * 1000;
         var ff = flowFrame(flowsData[fi].title, flowsData[fi].goal, fx, fy);
         var fRowContent = flowRow(ff, 24);
         flowHappyChain(fRowContent, flowsData[fi].happy);
@@ -2668,8 +2674,7 @@
     // =========================================================================
     // 18) WIREFRAMES LO-FI — Landing Desktop + Mobile
     // =========================================================================
-    figma.currentPage = pWF;
-
+    // Wireframes Lo-Fi con offset OFF_WF
     function wfBox(parent, label, h) {
         var w = makeFrame(parent, {
             bg: '#F3F4F6', stroke: '#9CA3AF', strokeWeight: 1, radius: 4,
@@ -2700,7 +2705,7 @@
         gap: 8, padding: 32,
         primarySizing: 'FIXED', counterSizing: 'FIXED'
     });
-    wfDesktop.x = 0; wfDesktop.y = 0;
+    wfDesktop.x = OFF_WF; wfDesktop.y = 0;
     makeText(wfDesktop, 'Wireframe · Desktop 1440', { size: 14, weight: 'Bold', color: '#6B7280' });
     var wfSecs = [
         ['NAVBAR · Logo | Inicio Servicios Cómo Trabajadores FAQ Login [Registrarse] ES|EN', 70],
@@ -2731,7 +2736,7 @@
         gap: 6, padding: 16,
         primarySizing: 'FIXED', counterSizing: 'FIXED'
     });
-    wfMobile.x = 1600; wfMobile.y = 0;
+    wfMobile.x = OFF_WF + 1500; wfMobile.y = 0;
     makeText(wfMobile, 'Wireframe · Mobile 375', { size: 12, weight: 'Bold', color: '#6B7280' });
     var wfMSecs = [
         ['NAVBAR · Logo + ES|EN + ☰', 70],
@@ -2934,11 +2939,10 @@
     }
 
     // ============================ APP SCREENS DESKTOP ============================
-    figma.currentPage = pAppD;
-
+    // Con offset OFF_APPD, grid de 4 columnas × 6 filas
     var appDX = 0, appDY = 0, appDCol = 0, appDRow = 0;
     function nextAppDesktopPos() {
-        var pos = { x: appDCol * 1520, y: appDRow * 980 };
+        var pos = { x: OFF_APPD + appDCol * 1520, y: appDRow * 980 };
         appDCol++;
         if (appDCol >= 4) { appDCol = 0; appDRow++; }
         return pos;
@@ -4420,11 +4424,10 @@
     })();
 
     // ============================ APP SCREENS MOBILE ============================
-    figma.currentPage = pAppM;
-
+    // Con offset OFF_APPM, grid de 8 columnas × 3 filas
     var appMCol = 0, appMRow = 0;
     function nextAppMobilePos() {
-        var pos = { x: appMCol * 430, y: appMRow * 880 };
+        var pos = { x: OFF_APPM + appMCol * 430, y: appMRow * 880 };
         appMCol++;
         if (appMCol >= 8) { appMCol = 0; appMRow++; }
         return pos;
@@ -5324,12 +5327,11 @@
     // =========================================================================
     // FINAL
     // =========================================================================
-    figma.currentPage = pDLand;
     try {
         figma.viewport.scrollAndZoomIntoView([landing]);
     } catch (e) { /* noop */ }
 
-    figma.closePlugin('✅ Ya Quedó v4 listo — 11 páginas organizadas, Design System, Componentes, Landing Desktop+Mobile, 4 diagramas IA + Site Map, 8 User Flows, Wireframes Lo-Fi, 22 pantallas App Desktop + 22 App Mobile.');
+    figma.closePlugin('✅ Ya Quedó v4.1 listo — Todo en Page 1: Cover, Design System, Componentes, Landing Desktop+Mobile, 4 diagramas IA + Site Map, 8 User Flows, Wireframes Lo-Fi, 22 pantallas App Desktop + 22 App Mobile. Usa el minimap de Figma o Shift+1 para ver todo.');
 })().catch(function (err) {
     var msg = err && err.message ? err.message : String(err);
     console.error(err);
