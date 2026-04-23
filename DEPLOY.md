@@ -31,9 +31,9 @@ Páginas legales:
 ## Opción B — Netlify (despliegue más rápido, sin workflow)
 
 1. Entra a [https://app.netlify.com/start](https://app.netlify.com/start).
-2. "Import from Git" → conecta tu repo GitHub `Ya-quedo-by-TetraDev`.
+2. "Import from Git" → conecta tu repo GitHub `yagocz/YaQuedo_TetraDev`.
 3. Build command: *(vacío)*. Publish directory: `.`. El archivo `netlify.toml` ya incluye seguridad y redirecciones.
-4. Netlify te dará una URL tipo `https://ya-quedo-tetradev.netlify.app` que puedes usar en el informe.
+4. Netlify te dará una URL tipo `https://yaquedo-tetradev.netlify.app` que puedes usar en el informe.
 
 ## Opción C — Vercel
 
@@ -55,8 +55,7 @@ Después del despliegue revisa:
 
 | Producto | URL pública |
 |---|---|
-| Landing Page (yagocz) | `https://yagocz.github.io/YaQuedo_TetraDev/` |
+| Landing Page | `https://yagocz.github.io/YaQuedo_TetraDev/` |
 | Repo Landing | `https://github.com/yagocz/YaQuedo_TetraDev` |
-| Repo mirror (upstream) | `https://github.com/BlackAmnesiac/Ya-quedo-by-TetraDev` |
 | Repo Web App (Angular, TB2+) | pendiente |
 | Repo Web Services (Spring Boot, TB2+) | pendiente |

@@ -44,7 +44,7 @@ Cada componente: **Auto Layout activado**, variables de color aplicadas, text st
 ## Paso 3 — Desktop Landing (página `🖥 Desktop — Landing`)
 
 1. Crea un Frame `Desktop / Landing` de **1440 × 5800**.
-2. Pega el screenshot `screenshots/desktop-full.png` en una capa **bloqueada** al costado (referencia visual).
+2. Abre en paralelo la URL pública de la landing (`https://yagocz.github.io/YaQuedo_TetraDev/`) como referencia visual.
 3. Auto Layout vertical del frame, gap 0.
 4. Sigue sección por sección **[03-screens-desktop.md](./03-screens-desktop.md)**:
    - Arrastra instancias de componentes en vez de recrearlos.
@@ -54,7 +54,7 @@ Cada componente: **Auto Layout activado**, variables de color aplicadas, text st
 ## Paso 4 — Mobile Landing (página `📱 Mobile — Landing`)
 
 1. Crea un Frame `Mobile / Landing` de **375 × 7800**.
-2. Pega el screenshot `screenshots/mobile-full.png` bloqueado como referencia.
+2. Abre la URL pública en modo mobile (DevTools → Toggle Device Toolbar) como referencia visual.
 3. **Duplica los componentes clave con variant Mobile** (sobre todo Navbar).
 4. Sigue **[04-screens-mobile.md](./04-screens-mobile.md)**. Por cada sección desktop, crea su equivalente mobile adaptando:
    - Grids → 1 columna
@@ -113,5 +113,4 @@ Landing → Registro Trabajador → Verificación Identidad → Crear Perfil/Ofi
 ## Referencias rápidas
 - Logo SVG: [`assets/logo.svg`](./assets/logo.svg)
 - Favicon: [`assets/favicon.svg`](./assets/favicon.svg)
-- Screenshot desktop: [`screenshots/desktop-full.png`](./screenshots/desktop-full.png)
-- Screenshot mobile: [`screenshots/mobile-full.png`](./screenshots/mobile-full.png)
+- Landing desplegada: https://yagocz.github.io/YaQuedo_TetraDev/
