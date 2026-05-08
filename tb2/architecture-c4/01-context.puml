@@ -1,0 +1,40 @@
+@startuml C4_Context_YaQuedo
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+title Diagrama de Contexto · Ya Quedó (Nivel 1 · C4 Model)
+
+' ============ Personas / Actores ============
+Person(cliente, "Cliente", "Persona de Lima Metropolitana (25-55 años, NSE B/C) que requiere servicios técnicos del hogar.")
+Person(trabajador, "Trabajador Independiente", "Técnico (electricista, gasfitero, pintor, cerrajero) entre 22-60 años que ofrece servicios.")
+Person(soporte, "Equipo de Soporte TetraDev", "Modera disputas, resuelve reclamos y verifica documentos rechazados.")
+
+' ============ Sistema principal ============
+System(yaQuedo, "Plataforma Ya Quedó", "Marketplace digital que conecta clientes con trabajadores independientes verificados, gestionando cotizaciones, pagos intermediados, reseñas y capacitaciones.")
+
+' ============ Sistemas externos ============
+System_Ext(yapeApi, "Yape API", "Procesador de pagos móviles en Perú.")
+System_Ext(niubizApi, "Niubiz Gateway", "Pasarela de tarjetas Visa/Mastercard/Amex.")
+System_Ext(reniecApi, "RENIEC API\n(vía proveedor)", "Verificación de identidad mediante DNI peruano.")
+System_Ext(smsApi, "Twilio SMS", "Envío de códigos OTP y notificaciones por SMS.")
+System_Ext(emailApi, "SendGrid", "Envío de correos transaccionales y de marketing.")
+System_Ext(mapsApi, "Google Maps API", "Geolocalización y autocompletado de direcciones.")
+System_Ext(ga4, "Google Analytics 4", "Analítica de uso y eventos de marketing.")
+System_Ext(s3, "Amazon S3 / Cloudinary", "Almacenamiento de fotos de DNI, perfiles y trabajos.")
+
+' ============ Relaciones Persona → Sistema ============
+Rel(cliente, yaQuedo, "Busca, contrata y califica servicios", "HTTPS")
+Rel(trabajador, yaQuedo, "Recibe solicitudes, gestiona perfil y cobros", "HTTPS")
+Rel(soporte, yaQuedo, "Modera, verifica documentos, resuelve disputas", "HTTPS")
+
+' ============ Relaciones Sistema → Externos ============
+Rel(yaQuedo, yapeApi, "Procesa pagos móviles", "HTTPS / REST")
+Rel(yaQuedo, niubizApi, "Procesa pagos con tarjeta", "HTTPS / REST")
+Rel(yaQuedo, reniecApi, "Verifica DNI del trabajador", "HTTPS / REST")
+Rel(yaQuedo, smsApi, "Envía OTP y notificaciones", "HTTPS / REST")
+Rel(yaQuedo, emailApi, "Envía correos transaccionales", "HTTPS / REST")
+Rel(yaQuedo, mapsApi, "Geocodifica direcciones", "HTTPS / REST")
+Rel(yaQuedo, ga4, "Reporta eventos de uso", "HTTPS")
+Rel(yaQuedo, s3, "Almacena imágenes (DNI, fotos)", "HTTPS / S3 API")
+
+@enduml

@@ -1,0 +1,280 @@
+@startuml DatabaseER_YaQuedo
+title Modelo Entidad-Relación · Base de Datos Ya Quedó (PostgreSQL 16)\nNormalizado a 3FN — claves primarias en negrita, foráneas en cursiva
+
+!define table(name) entity name as "name"
+!define pk(x) <b>x</b>
+!define fk(x) <i>x</i>
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #1F2937
+  ArrowColor #4F46E5
+}
+
+' ============ IAM ============
+entity "users" as users {
+  pk(id) : UUID
+  ---
+  email : VARCHAR(255) UNIQUE NOT NULL
+  password_hash : VARCHAR(255) NOT NULL
+  phone : VARCHAR(20) UNIQUE
+  status : ENUM(pending, active, suspended, blocked)
+  user_type : ENUM(customer, worker, support)
+  created_at : TIMESTAMP DEFAULT NOW()
+  last_login_at : TIMESTAMP
+}
+
+entity "customers" as customers {
+  pk(id) : UUID
+  ---
+  fk(user_id) : UUID UNIQUE NOT NULL → users.id
+  first_name : VARCHAR(100) NOT NULL
+  last_name : VARCHAR(100) NOT NULL
+  default_district_id : UUID FK
+}
+
+entity "workers" as workers {
+  pk(id) : UUID
+  ---
+  fk(user_id) : UUID UNIQUE NOT NULL → users.id
+  first_name : VARCHAR(100) NOT NULL
+  last_name : VARCHAR(100) NOT NULL
+  dni : VARCHAR(8) UNIQUE
+  bio : TEXT
+  rating_avg : DECIMAL(3,2) DEFAULT 0
+  total_services : INT DEFAULT 0
+  verified : BOOLEAN DEFAULT FALSE
+  created_at : TIMESTAMP
+}
+
+' ============ Identity ============
+entity "identity_verifications" as verif {
+  pk(id) : UUID
+  ---
+  fk(worker_id) : UUID NOT NULL → workers.id
+  dni_front_url : VARCHAR(500)
+  dni_back_url : VARCHAR(500)
+  selfie_url : VARCHAR(500)
+  status : ENUM(submitted, under_review, verified, rejected)
+  submitted_at : TIMESTAMP
+  reviewed_at : TIMESTAMP
+  rejection_reason : TEXT
+  reviewed_by : UUID FK → users.id
+}
+
+' ============ Catalog ============
+entity "service_categories" as cats {
+  pk(id) : UUID
+  ---
+  name : VARCHAR(100) UNIQUE NOT NULL
+  slug : VARCHAR(100) UNIQUE NOT NULL
+  description : TEXT
+  icon_key : VARCHAR(50)
+  active : BOOLEAN DEFAULT TRUE
+}
+
+' ============ Districts ============
+entity "districts" as districts {
+  pk(id) : UUID
+  ---
+  name : VARCHAR(100) NOT NULL
+  region : VARCHAR(100) NOT NULL
+  ubigeo : VARCHAR(10)
+}
+
+' ============ Worker offerings + coverage ============
+entity "worker_offerings" as offerings {
+  pk(id) : UUID
+  ---
+  fk(worker_id) : UUID NOT NULL → workers.id
+  fk(category_id) : UUID NOT NULL → service_categories.id
+  base_price : DECIMAL(10,2) NOT NULL
+  estimated_hours : INT NOT NULL
+  active : BOOLEAN DEFAULT TRUE
+  ---
+  UNIQUE(worker_id, category_id)
+}
+
+entity "worker_coverage" as coverage {
+  pk(id) : UUID
+  ---
+  fk(worker_id) : UUID NOT NULL → workers.id
+  fk(district_id) : UUID NOT NULL → districts.id
+  ---
+  UNIQUE(worker_id, district_id)
+}
+
+entity "addresses" as addresses {
+  pk(id) : UUID
+  ---
+  fk(customer_id) : UUID NOT NULL → customers.id
+  street : VARCHAR(255) NOT NULL
+  reference : VARCHAR(255)
+  fk(district_id) : UUID NOT NULL → districts.id
+  lat : DECIMAL(10,7)
+  lng : DECIMAL(10,7)
+  is_default : BOOLEAN DEFAULT FALSE
+}
+
+' ============ Booking ============
+entity "quotes" as quotes {
+  pk(id) : UUID
+  ---
+  fk(customer_id) : UUID NOT NULL → customers.id
+  fk(worker_id) : UUID NOT NULL → workers.id
+  fk(category_id) : UUID NOT NULL → service_categories.id
+  description : TEXT NOT NULL
+  urgency : ENUM(urgent, this_week, no_rush)
+  photos : JSONB
+  status : ENUM(pending, responded, accepted, rejected, expired)
+  amount : DECIMAL(10,2)
+  estimated_hours : INT
+  proposed_date : TIMESTAMP
+  created_at : TIMESTAMP DEFAULT NOW()
+  responded_at : TIMESTAMP
+  expires_at : TIMESTAMP
+}
+
+entity "bookings" as bookings {
+  pk(id) : UUID
+  ---
+  fk(quote_id) : UUID UNIQUE NOT NULL → quotes.id
+  fk(address_id) : UUID NOT NULL → addresses.id
+  scheduled_at : TIMESTAMP NOT NULL
+  status : ENUM(scheduled, in_progress, completed, cancelled, disputed)
+  confirmed_at : TIMESTAMP
+  completed_at : TIMESTAMP
+  cancellation_reason : TEXT
+  created_at : TIMESTAMP DEFAULT NOW()
+}
+
+' ============ Payment ============
+entity "payments" as payments {
+  pk(id) : UUID
+  ---
+  fk(booking_id) : UUID UNIQUE NOT NULL → bookings.id
+  method : ENUM(yape, plin, card)
+  amount : DECIMAL(10,2) NOT NULL
+  commission : DECIMAL(10,2) NOT NULL
+  net_amount : DECIMAL(10,2) NOT NULL
+  status : ENUM(initiated, held, released, refunded, disputed)
+  gateway_tx_id : VARCHAR(100)
+  captured_at : TIMESTAMP
+  released_at : TIMESTAMP
+}
+
+' ============ Reputation ============
+entity "reviews" as reviews {
+  pk(id) : UUID
+  ---
+  fk(booking_id) : UUID UNIQUE NOT NULL → bookings.id
+  fk(customer_id) : UUID NOT NULL → customers.id
+  fk(worker_id) : UUID NOT NULL → workers.id
+  rating : INT CHECK (rating BETWEEN 1 AND 5) NOT NULL
+  comment : TEXT
+  photo_url : VARCHAR(500)
+  aspects : JSONB
+  response : TEXT
+  flagged : BOOLEAN DEFAULT FALSE
+  published_at : TIMESTAMP
+  responded_at : TIMESTAMP
+}
+
+entity "badges" as badges {
+  pk(id) : UUID
+  ---
+  fk(worker_id) : UUID NOT NULL → workers.id
+  type : ENUM(verified, top_rated, course_certified)
+  metadata : JSONB
+  granted_at : TIMESTAMP DEFAULT NOW()
+  revoked_at : TIMESTAMP
+}
+
+' ============ Training ============
+entity "courses" as courses {
+  pk(id) : UUID
+  ---
+  title : VARCHAR(200) NOT NULL
+  description : TEXT
+  video_url : VARCHAR(500)
+  duration_min : INT NOT NULL
+  required_score : INT DEFAULT 4
+  active : BOOLEAN DEFAULT TRUE
+}
+
+entity "quiz_questions" as questions {
+  pk(id) : UUID
+  ---
+  fk(course_id) : UUID NOT NULL → courses.id
+  text : TEXT NOT NULL
+  options : JSONB NOT NULL
+  correct_index : INT NOT NULL
+  position : INT NOT NULL
+}
+
+entity "course_completions" as completions {
+  pk(id) : UUID
+  ---
+  fk(worker_id) : UUID NOT NULL → workers.id
+  fk(course_id) : UUID NOT NULL → courses.id
+  score : INT NOT NULL
+  passed : BOOLEAN NOT NULL
+  completed_at : TIMESTAMP DEFAULT NOW()
+  badge_id : UUID FK → badges.id
+}
+
+' ============ Notification ============
+entity "notifications" as notifs {
+  pk(id) : UUID
+  ---
+  fk(recipient_id) : UUID NOT NULL → users.id
+  channel : ENUM(push, email, sms)
+  title : VARCHAR(200)
+  body : TEXT
+  sent_at : TIMESTAMP DEFAULT NOW()
+  read_at : TIMESTAMP
+}
+
+' ============ Audit ============
+entity "audit_log" as audit {
+  pk(id) : UUID
+  ---
+  fk(user_id) : UUID FK → users.id
+  action : VARCHAR(100) NOT NULL
+  entity_type : VARCHAR(100)
+  entity_id : UUID
+  metadata : JSONB
+  ip : VARCHAR(45)
+  created_at : TIMESTAMP DEFAULT NOW()
+}
+
+' ============ Relaciones ============
+users ||--o| customers
+users ||--o| workers
+workers ||--o{ verif
+workers ||--o{ offerings
+service_categories ||--o{ offerings
+workers ||--o{ coverage
+districts ||--o{ coverage
+customers ||--o{ addresses
+districts ||--o{ addresses
+customers ||--o{ quotes
+workers ||--o{ quotes
+service_categories ||--o{ quotes
+quotes ||--o| bookings
+addresses ||--o{ bookings
+bookings ||--|| payments
+bookings ||--o| reviews
+customers ||--o{ reviews
+workers ||--o{ reviews
+workers ||--o{ badges
+courses ||--o{ questions
+workers ||--o{ completions
+courses ||--o{ completions
+badges ||--o{ completions
+users ||--o{ notifs
+users ||--o{ audit
+
+@enduml

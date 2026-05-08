@@ -1,0 +1,313 @@
+@startuml ClassDiagram_YaQuedo
+title Diagrama de Clases · Dominio Ya Quedó (Bounded Contexts agrupados)
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #1F2937
+  ArrowColor #6366F1
+}
+skinparam package {
+  BackgroundColor #F3F4F6
+  BorderColor #6B7280
+}
+
+' ============ IAM Bounded Context ============
+package "IAM (Identity & Access)" {
+
+  abstract class User {
+    -id: UUID
+    -email: String
+    -passwordHash: String
+    -phone: String
+    -status: UserStatus
+    -createdAt: LocalDateTime
+    -lastLoginAt: LocalDateTime
+    +login(password): JwtToken
+    +changePassword(old, new): void
+    +verifyEmail(): void
+  }
+
+  class Customer extends User {
+    -firstName: String
+    -lastName: String
+    -defaultDistrict: District
+    -addresses: List<Address>
+    +addAddress(addr): void
+  }
+
+  class Worker extends User {
+    -firstName: String
+    -lastName: String
+    -dni: String
+    -bio: String
+    -ratingAvg: BigDecimal
+    -totalServices: int
+    -verified: boolean
+    +isTopRated(): boolean
+    +recalculateRating(): void
+  }
+
+  enum UserStatus {
+    PENDING_VERIFICATION
+    ACTIVE
+    SUSPENDED
+    BLOCKED
+  }
+}
+
+' ============ Identity / Verification ============
+package "Identity (Verification)" {
+  class IdentityVerification {
+    -id: UUID
+    -workerId: UUID
+    -dniFrontUrl: String
+    -dniBackUrl: String
+    -selfieUrl: String
+    -status: VerificationStatus
+    -submittedAt: LocalDateTime
+    -reviewedAt: LocalDateTime
+    -rejectionReason: String
+    +submit(): void
+    +approve(reviewer): void
+    +reject(reason): void
+  }
+  enum VerificationStatus {
+    SUBMITTED
+    UNDER_REVIEW
+    VERIFIED
+    REJECTED
+  }
+}
+
+' ============ Catalog ============
+package "Catalog" {
+  class ServiceCategory {
+    -id: UUID
+    -name: String
+    -slug: String
+    -description: String
+    -iconKey: String
+    -active: boolean
+  }
+}
+
+' ============ Worker offerings ============
+package "Worker (Profile)" {
+  class WorkerOffering {
+    -id: UUID
+    -workerId: UUID
+    -categoryId: UUID
+    -basePrice: Money
+    -estimatedHours: int
+    -active: boolean
+  }
+  class District {
+    -id: UUID
+    -name: String
+    -region: String
+  }
+  class WorkerCoverage {
+    -workerId: UUID
+    -districtId: UUID
+  }
+}
+
+' ============ Booking (Quote + Booking) ============
+package "Booking" {
+  class Quote {
+    -id: UUID
+    -customerId: UUID
+    -workerId: UUID
+    -categoryId: UUID
+    -description: String
+    -urgency: Urgency
+    -photos: List<String>
+    -status: QuoteStatus
+    -amount: Money
+    -estimatedHours: int
+    -proposedDate: LocalDateTime
+    -createdAt: LocalDateTime
+    -respondedAt: LocalDateTime
+    +respond(amount, hours, date): void
+    +accept(): Booking
+    +reject(): void
+    +expire(): void
+  }
+  class Booking {
+    -id: UUID
+    -quoteId: UUID
+    -scheduledAt: LocalDateTime
+    -address: Address
+    -status: BookingStatus
+    -confirmedAt: LocalDateTime
+    -completedAt: LocalDateTime
+    +confirm(): void
+    +complete(): void
+    +cancel(reason): void
+  }
+  class Address {
+    -street: String
+    -reference: String
+    -districtId: UUID
+    -lat: BigDecimal
+    -lng: BigDecimal
+  }
+  enum QuoteStatus {
+    PENDING
+    RESPONDED
+    ACCEPTED
+    REJECTED
+    EXPIRED
+  }
+  enum BookingStatus {
+    SCHEDULED
+    IN_PROGRESS
+    COMPLETED
+    CANCELLED
+    DISPUTED
+  }
+  enum Urgency {
+    URGENT
+    THIS_WEEK
+    NO_RUSH
+  }
+}
+
+' ============ Payment ============
+package "Payment" {
+  class Payment {
+    -id: UUID
+    -bookingId: UUID
+    -method: PaymentMethod
+    -amount: Money
+    -commission: Money
+    -netAmount: Money
+    -status: PaymentStatus
+    -gatewayTxId: String
+    -capturedAt: LocalDateTime
+    -releasedAt: LocalDateTime
+    +capture(): void
+    +release(): void
+    +refund(reason): void
+    +hold(): void
+  }
+  class Money {
+    -amount: BigDecimal
+    -currency: String
+  }
+  enum PaymentMethod { YAPE PLIN CARD }
+  enum PaymentStatus {
+    INITIATED
+    HELD
+    RELEASED
+    REFUNDED
+    DISPUTED
+  }
+}
+
+' ============ Reputation ============
+package "Reputation" {
+  class Review {
+    -id: UUID
+    -bookingId: UUID
+    -customerId: UUID
+    -workerId: UUID
+    -rating: int
+    -comment: String
+    -photoUrl: String
+    -aspects: Set<ReviewAspect>
+    -response: String
+    -publishedAt: LocalDateTime
+    +publish(): void
+    +respond(text): void
+    +flagAsAbusive(): void
+  }
+  enum ReviewAspect {
+    PUNCTUALITY
+    CLEANLINESS
+    PRICE
+    PROFESSIONALISM
+  }
+  class Badge {
+    -id: UUID
+    -workerId: UUID
+    -type: BadgeType
+    -grantedAt: LocalDateTime
+    -revokedAt: LocalDateTime
+  }
+  enum BadgeType {
+    VERIFIED
+    TOP_RATED
+    COURSE_CERTIFIED
+  }
+}
+
+' ============ Training ============
+package "Training" {
+  class Course {
+    -id: UUID
+    -title: String
+    -description: String
+    -videoUrl: String
+    -durationMin: int
+    -requiredScore: int
+    -active: boolean
+  }
+  class Quiz {
+    -id: UUID
+    -courseId: UUID
+    -questions: List<QuizQuestion>
+  }
+  class QuizQuestion {
+    -id: UUID
+    -text: String
+    -options: List<String>
+    -correctIndex: int
+  }
+  class CourseCompletion {
+    -id: UUID
+    -workerId: UUID
+    -courseId: UUID
+    -score: int
+    -passed: boolean
+    -completedAt: LocalDateTime
+    +grantBadge(): Badge
+  }
+}
+
+' ============ Notifications ============
+package "Notification" {
+  class Notification {
+    -id: UUID
+    -recipientId: UUID
+    -channel: Channel
+    -title: String
+    -body: String
+    -sentAt: LocalDateTime
+    -readAt: LocalDateTime
+  }
+  enum Channel { PUSH EMAIL SMS }
+}
+
+' ============ Relaciones (asociaciones) ============
+Customer "1" -- "0..*" Quote : crea >
+Worker "1" -- "0..*" Quote : recibe >
+Worker "1" -- "0..*" WorkerOffering : ofrece >
+ServiceCategory "1" -- "0..*" WorkerOffering : pertenece a <
+Worker "1" -- "0..*" WorkerCoverage : opera en >
+WorkerCoverage "*" -- "1" District : cubre <
+Quote "1" -- "0..1" Booking : genera >
+Booking "1" -- "1" Payment : tiene >
+Booking "1" -- "0..1" Review : recibe >
+Review "*" -- "1" Worker : sobre <
+Worker "1" -- "0..*" Badge : tiene >
+Worker "1" -- "0..1" IdentityVerification : valida con >
+Worker "1" -- "0..*" CourseCompletion : completa >
+CourseCompletion "*" -- "1" Course : sobre <
+Course "1" -- "1" Quiz : evaluado por >
+Quiz "1" -- "0..*" QuizQuestion : contiene >
+User "1" -- "0..*" Notification : recibe >
+
+@enduml

@@ -1,0 +1,145 @@
+@startuml C4_Component_YaQuedo_Backend
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+LAYOUT_WITH_LEGEND()
+title Diagrama de Componentes · Backend Ya Quedó (Nivel 3 · C4 Model)\n(Bounded Contexts según Domain-Driven Design)
+
+Container(webApp, "Web Application", "Angular SPA")
+
+System_Boundary(api, "Web Services · Spring Boot 3.2") {
+
+    ' ============ Identity & Access (Bounded Context: IAM) ============
+    Component(authController, "AuthController", "@RestController", "Endpoints de registro, login, OTP, refresh.\n/auth/register, /auth/login, /auth/otp/verify")
+    Component(authService, "AuthenticationService", "@Service", "Orquesta el flujo de autenticación: hash password, valida OTP, genera JWT.")
+    Component(jwtProvider, "JwtTokenProvider", "@Component", "Genera y valida tokens JWT con clave privada (RS256).")
+    Component(userRepo, "UserRepository", "@Repository · JpaRepository<User>", "Persistencia de usuarios.")
+
+    ' ============ Verification (Bounded Context: Identity) ============
+    Component(verifController, "VerificationController", "@RestController", "Sube DNI/selfie del trabajador y consulta estado.\n/workers/{id}/verify-identity, GET /verifications/{id}")
+    Component(verifService, "VerificationService", "@Service", "Aplica reglas: máx 48h de revisión, retry tras rechazo, anti-fraude.")
+    Component(reniecAdapter, "ReniecAdapter", "@Component", "Anti-corruption layer hacia el proveedor RENIEC.")
+    Component(verifRepo, "VerificationRepository", "@Repository", "Persiste solicitudes y estados.")
+
+    ' ============ Catalog (Bounded Context: Catalog) ============
+    Component(catalogController, "CategoryController", "@RestController", "Lista y administra categorías de servicios.\nGET /categories")
+    Component(catalogService, "CategoryService", "@Service", "Reglas de catálogo (visibilidad, jerarquía).")
+    Component(categoryRepo, "CategoryRepository", "@Repository", "Persistencia de categorías.")
+
+    ' ============ Worker Profile (Bounded Context: Worker) ============
+    Component(workerController, "WorkerController", "@RestController", "Búsqueda, perfil público, perfil editable.\nGET /workers, GET /workers/{id}, PUT /workers/me")
+    Component(workerService, "WorkerProfileService", "@Service", "Orquesta perfil: oficios, tarifas, galería, disponibilidad.")
+    Component(workerSearchService, "WorkerSearchService", "@Service", "Búsqueda con geolocalización, filtros y orden por rating.")
+    Component(workerRepo, "WorkerRepository", "@Repository", "Persistencia de perfiles de trabajadores.")
+
+    ' ============ Booking (Bounded Context: Booking) ============
+    Component(quoteController, "QuoteController", "@RestController", "Crear, responder, aceptar cotizaciones.\nPOST /quotes, POST /quotes/{id}/respond, POST /quotes/{id}/accept")
+    Component(bookingController, "BookingController", "@RestController", "Confirma agendamiento y cierra servicio.\nPOST /bookings, GET /bookings/{id}, POST /bookings/{id}/complete")
+    Component(quoteService, "QuoteService", "@Service", "Reglas: máx 3 trabajadores en paralelo, timeout 2h, sugerir alternativas.")
+    Component(bookingService, "BookingService", "@Service", "Reglas de agenda, slots disponibles, confirmaciones.")
+    Component(quoteRepo, "QuoteRepository", "@Repository", "")
+    Component(bookingRepo, "BookingRepository", "@Repository", "")
+
+    ' ============ Payments (Bounded Context: Payment) ============
+    Component(paymentController, "PaymentController", "@RestController", "Inicia checkout y libera fondos.\nPOST /payments/checkout, GET /payments/{id}/receipt")
+    Component(paymentService, "PaymentService", "@Service", "Retiene fondos 24-72h, calcula comisión 12%, gestiona disputas.")
+    Component(yapeAdapter, "YapeAdapter", "@Component", "Anti-corruption layer hacia Yape API.")
+    Component(niubizAdapter, "NiubizAdapter", "@Component", "Anti-corruption layer hacia Niubiz Gateway.")
+    Component(paymentRepo, "PaymentRepository", "@Repository", "")
+
+    ' ============ Reputation (Bounded Context: Reputation) ============
+    Component(reviewController, "ReviewController", "@RestController", "Calificación post-servicio y respuesta del trabajador.\nPOST /reviews, POST /reviews/{id}/response")
+    Component(reviewService, "ReviewService", "@Service", "Aplica filtro de contenido ofensivo, recalcula rating.")
+    Component(badgeService, "BadgeService", "@Service", "Otorga insignias Top Rated, Verificado, Certificado.")
+    Component(reviewRepo, "ReviewRepository", "@Repository", "")
+
+    ' ============ Training (Bounded Context: Training) ============
+    Component(trainingController, "CourseController", "@RestController", "Catálogo de cursos, progreso, quiz, insignia.\nGET /courses, POST /courses/{id}/quiz")
+    Component(courseService, "CourseService", "@Service", "Reglas de aprobación (≥4/5), reintentos 24h, video offline.")
+    Component(quizService, "QuizService", "@Service", "Evalúa respuestas y entrega resultado.")
+    Component(courseRepo, "CourseRepository", "@Repository", "")
+
+    ' ============ Notification (Bounded Context: Notification, transversal) ============
+    Component(notifService, "NotificationService", "@Service", "Coordina envío multi-canal (push, email, SMS).")
+    Component(emailAdapter, "EmailAdapter", "@Component", "Adapter SendGrid.")
+    Component(smsAdapter, "SmsAdapter", "@Component", "Adapter Twilio.")
+
+    ' ============ Cross-cutting ============
+    Component(security, "SecurityConfig", "@Configuration", "Spring Security: JWT, CORS, CSRF, rate-limit.")
+    Component(audit, "AuditAspect", "@Aspect", "AOP que registra accesos sensibles a auditoría.")
+    Component(exceptionHandler, "GlobalExceptionHandler", "@RestControllerAdvice", "Mapeo uniforme de errores a HTTP 4xx/5xx.")
+}
+
+ContainerDb(db, "PostgreSQL 16", "Base de datos relacional")
+System_Ext(reniec, "RENIEC API")
+System_Ext(yape, "Yape API")
+System_Ext(niubiz, "Niubiz")
+System_Ext(twilio, "Twilio SMS")
+System_Ext(sendgrid, "SendGrid")
+
+' ============ Flujos principales ============
+Rel(webApp, authController, "POST /auth/...", "JSON / JWT")
+Rel(webApp, verifController, "POST /workers/{id}/verify-identity", "JSON")
+Rel(webApp, catalogController, "GET /categories")
+Rel(webApp, workerController, "GET /workers/search")
+Rel(webApp, quoteController, "POST /quotes")
+Rel(webApp, bookingController, "POST /bookings")
+Rel(webApp, paymentController, "POST /payments/checkout")
+Rel(webApp, reviewController, "POST /reviews")
+Rel(webApp, trainingController, "GET /courses")
+
+Rel(authController, authService, "")
+Rel(authService, jwtProvider, "")
+Rel(authService, userRepo, "")
+
+Rel(verifController, verifService, "")
+Rel(verifService, reniecAdapter, "")
+Rel(verifService, verifRepo, "")
+Rel(reniecAdapter, reniec, "HTTPS")
+
+Rel(catalogController, catalogService, "")
+Rel(catalogService, categoryRepo, "")
+
+Rel(workerController, workerService, "")
+Rel(workerController, workerSearchService, "")
+Rel(workerService, workerRepo, "")
+Rel(workerSearchService, workerRepo, "")
+
+Rel(quoteController, quoteService, "")
+Rel(bookingController, bookingService, "")
+Rel(quoteService, quoteRepo, "")
+Rel(bookingService, bookingRepo, "")
+Rel(quoteService, notifService, "Notificar trabajador")
+
+Rel(paymentController, paymentService, "")
+Rel(paymentService, yapeAdapter, "")
+Rel(paymentService, niubizAdapter, "")
+Rel(paymentService, paymentRepo, "")
+Rel(yapeAdapter, yape, "HTTPS")
+Rel(niubizAdapter, niubiz, "HTTPS")
+
+Rel(reviewController, reviewService, "")
+Rel(reviewService, badgeService, "Recalcular Top Rated")
+Rel(reviewService, reviewRepo, "")
+
+Rel(trainingController, courseService, "")
+Rel(courseService, quizService, "")
+Rel(courseService, courseRepo, "")
+Rel(courseService, badgeService, "Otorgar insignia")
+
+Rel(notifService, emailAdapter, "")
+Rel(notifService, smsAdapter, "")
+Rel(emailAdapter, sendgrid, "HTTPS")
+Rel(smsAdapter, twilio, "HTTPS")
+
+' Persistencia (todos los repositorios apuntan a db, pero solo mostramos uno como representativo)
+Rel(userRepo, db, "JDBC")
+Rel(verifRepo, db, "JDBC")
+Rel(categoryRepo, db, "JDBC")
+Rel(workerRepo, db, "JDBC")
+Rel(quoteRepo, db, "JDBC")
+Rel(bookingRepo, db, "JDBC")
+Rel(paymentRepo, db, "JDBC")
+Rel(reviewRepo, db, "JDBC")
+Rel(courseRepo, db, "JDBC")
+
+@enduml

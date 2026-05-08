@@ -1,0 +1,59 @@
+@startuml C4_Container_YaQuedo
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+title Diagrama de Contenedores · Ya Quedó (Nivel 2 · C4 Model)
+
+Person(cliente, "Cliente", "Persona que contrata servicios.")
+Person(trabajador, "Trabajador", "Técnico independiente.")
+Person(soporte, "Soporte", "Equipo TetraDev.")
+
+System_Boundary(yaQuedo, "Plataforma Ya Quedó") {
+
+    Container(landing, "Landing Page", "HTML5 + CSS3 + JavaScript ES6+", "Sitio público con propuesta de valor, formulario de pre-registro, FAQ y páginas legales. Cubre US-01 a US-10.")
+
+    Container(webApp, "Web Application (SPA)", "Angular 17 + TypeScript + Angular Material", "Aplicación responsive (desktop/mobile) que ejecuta los flujos logueados: registro, búsqueda, cotización, pago, calificación, capacitación.")
+
+    Container(api, "Web Services (API REST)", "Spring Boot 3.2 + Java 21", "API RESTful que orquesta toda la lógica de negocio del marketplace siguiendo Domain-Driven Design. Expone OpenAPI/Swagger.")
+
+    ContainerDb(db, "Base de Datos", "PostgreSQL 16", "Persiste usuarios, trabajadores, servicios, cotizaciones, reservas, pagos, reseñas, certificaciones y notificaciones.")
+
+    ContainerDb(cache, "Cache", "Redis 7", "Almacena sesiones JWT, rate-limiting y resultados de búsqueda frecuentes.")
+
+    Container(fileStorage, "File Storage", "Amazon S3 / Cloudinary", "Almacena imágenes de DNI, fotos de perfil y de trabajos realizados.")
+}
+
+System_Ext(yapeApi, "Yape API", "Pagos móviles")
+System_Ext(niubizApi, "Niubiz Gateway", "Pagos tarjeta")
+System_Ext(reniecApi, "RENIEC API", "Verificación DNI")
+System_Ext(smsApi, "Twilio", "SMS / OTP")
+System_Ext(emailApi, "SendGrid", "Correos")
+System_Ext(mapsApi, "Google Maps", "Geocoding")
+System_Ext(ga4, "Google Analytics 4", "Analítica")
+
+' Personas → Containers
+Rel(cliente, landing, "Visita propuesta de valor, deja pre-registro", "HTTPS")
+Rel(cliente, webApp, "Busca, cotiza, paga, califica", "HTTPS")
+Rel(trabajador, landing, "Conoce beneficios para trabajadores", "HTTPS")
+Rel(trabajador, webApp, "Verifica DNI, gestiona perfil, responde solicitudes, cobra", "HTTPS")
+Rel(soporte, webApp, "Modera reseñas y resuelve disputas", "HTTPS")
+
+' Containers → Backend
+Rel(landing, ga4, "Eventos page_view, form_submit", "HTTPS")
+Rel(webApp, api, "Llamadas REST con JWT Bearer", "HTTPS / JSON")
+Rel(landing, api, "POST /pre-register", "HTTPS / JSON")
+
+' Backend → Persistencia
+Rel(api, db, "Lee y escribe datos de dominio", "JDBC / TLS")
+Rel(api, cache, "Cachea sesiones y queries", "Redis Protocol")
+Rel(api, fileStorage, "Sube/recupera imágenes", "HTTPS / S3 API")
+
+' Backend → Servicios externos
+Rel(api, yapeApi, "Procesa pagos Yape", "HTTPS / REST")
+Rel(api, niubizApi, "Procesa pagos tarjeta", "HTTPS / REST")
+Rel(api, reniecApi, "Valida DNI trabajadores", "HTTPS / REST")
+Rel(api, smsApi, "Envía OTP", "HTTPS / REST")
+Rel(api, emailApi, "Envía correos", "HTTPS / REST")
+Rel(api, mapsApi, "Geocodifica direcciones", "HTTPS / REST")
+
+@enduml

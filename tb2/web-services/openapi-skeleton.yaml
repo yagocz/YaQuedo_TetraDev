@@ -1,0 +1,434 @@
+openapi: 3.0.3
+info:
+  title: Ya Quedó · Web Services API
+  description: |
+    API RESTful del marketplace Ya Quedó. Sprint 2 cubre 12 endpoints en 4 Bounded Contexts:
+    IAM, Identity, Catalog y Worker.
+  version: 0.2.0
+  contact:
+    name: TetraDev
+    email: dev@yaquedo.pe
+  license:
+    name: Proprietary
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local · Docker Compose
+  - url: https://api.yaquedo.pe/v1
+    description: Producción (TB3+)
+
+tags:
+  - name: Auth
+    description: Registro, login, OTP, recuperación de contraseña.
+  - name: Identity
+    description: Verificación de identidad del trabajador.
+  - name: Catalog
+    description: Categorías de servicios.
+  - name: Worker
+    description: Perfil, búsqueda y oficios del trabajador.
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Registra un nuevo usuario y envía OTP por SMS.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Usuario creado, OTP enviado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '409':
+          description: Email o teléfono ya registrado.
+        '400':
+          description: Validación fallida.
+
+  /auth/otp/verify:
+    post:
+      tags: [Auth]
+      summary: Verifica el OTP y activa la cuenta.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OtpVerifyRequest'
+      responses:
+        '200':
+          description: OTP válido, cuenta activada.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '400':
+          description: OTP inválido.
+        '429':
+          description: Demasiados intentos, esperar 60s.
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Autentica un usuario y devuelve JWT.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login exitoso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthTokenResponse'
+        '401':
+          description: Credenciales inválidas.
+        '429':
+          description: Bloqueo temporal por intentos fallidos.
+
+  /auth/recover:
+    post:
+      tags: [Auth]
+      summary: Envía link de recuperación de contraseña al email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string, format: email }
+      responses:
+        '204':
+          description: Si el email existe, se envía el link.
+
+  /workers/{id}/verify-identity:
+    post:
+      tags: [Identity]
+      security: [ { bearerAuth: [] } ]
+      summary: Sube DNI y selfie del trabajador.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [dniFront, dniBack, selfie]
+              properties:
+                dniFront: { type: string, format: binary }
+                dniBack: { type: string, format: binary }
+                selfie: { type: string, format: binary }
+      responses:
+        '201':
+          description: Verificación enviada, en revisión.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+
+  /verifications/{id}:
+    get:
+      tags: [Identity]
+      security: [ { bearerAuth: [] } ]
+      summary: Consulta el estado de una verificación.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Estado actual.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationResponse'
+
+  /workers/me:
+    put:
+      tags: [Worker]
+      security: [ { bearerAuth: [] } ]
+      summary: Actualiza el perfil del trabajador autenticado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+      responses:
+        '200':
+          description: Perfil actualizado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkerProfileResponse'
+
+  /workers/me/offerings:
+    post:
+      tags: [Worker]
+      security: [ { bearerAuth: [] } ]
+      summary: Define oficios y tarifas del trabajador.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [offerings]
+              properties:
+                offerings:
+                  type: array
+                  items: { $ref: '#/components/schemas/OfferingRequest' }
+      responses:
+        '200':
+          description: Oficios actualizados.
+
+  /workers/me/coverage:
+    put:
+      tags: [Worker]
+      security: [ { bearerAuth: [] } ]
+      summary: Define los distritos que cubre el trabajador.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [districtIds]
+              properties:
+                districtIds:
+                  type: array
+                  items: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Cobertura actualizada.
+
+  /categories:
+    get:
+      tags: [Catalog]
+      summary: Lista las categorías de servicios.
+      responses:
+        '200':
+          description: Lista de categorías.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Category' }
+
+  /workers/search:
+    get:
+      tags: [Worker]
+      summary: Busca trabajadores con filtros.
+      parameters:
+        - in: query
+          name: categoryId
+          schema: { type: string, format: uuid }
+        - in: query
+          name: districtId
+          schema: { type: string, format: uuid }
+        - in: query
+          name: minRating
+          schema: { type: number, format: float, minimum: 0, maximum: 5 }
+        - in: query
+          name: maxPrice
+          schema: { type: number, format: float }
+        - in: query
+          name: page
+          schema: { type: integer, default: 0 }
+        - in: query
+          name: size
+          schema: { type: integer, default: 20, maximum: 50 }
+        - in: query
+          name: sort
+          schema: { type: string, enum: [proximity, rating, price] }
+      responses:
+        '200':
+          description: Resultados de búsqueda.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/WorkerSearchResult' }
+                  meta:
+                    type: object
+                    properties:
+                      total: { type: integer }
+                      page: { type: integer }
+                      size: { type: integer }
+                      fallback:
+                        type: object
+                        properties:
+                          applied: { type: boolean }
+                          reason: { type: string, nullable: true }
+
+  /workers/{id}:
+    get:
+      tags: [Worker]
+      summary: Devuelve el perfil público de un trabajador.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Perfil del trabajador.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkerProfileResponse'
+        '404':
+          description: Trabajador no encontrado.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [email, phone, password, firstName, lastName, userType]
+      properties:
+        email: { type: string, format: email }
+        phone: { type: string, pattern: '^\\+?\\d{9,15}$' }
+        password: { type: string, minLength: 8 }
+        firstName: { type: string, minLength: 2 }
+        lastName: { type: string, minLength: 2 }
+        userType: { type: string, enum: [CUSTOMER, WORKER] }
+    RegisterResponse:
+      type: object
+      properties:
+        userId: { type: string, format: uuid }
+        status: { type: string, enum: [PENDING_VERIFICATION] }
+        otpSentTo: { type: string, description: 'Teléfono enmascarado' }
+        otpExpiresAt: { type: string, format: date-time }
+    OtpVerifyRequest:
+      type: object
+      required: [userId, code]
+      properties:
+        userId: { type: string, format: uuid }
+        code: { type: string, pattern: '^\\d{6}$' }
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+    AuthTokenResponse:
+      type: object
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        expiresIn: { type: integer, description: 'segundos' }
+        user: { $ref: '#/components/schemas/UserSummary' }
+    UserSummary:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        userType: { type: string, enum: [CUSTOMER, WORKER] }
+        firstName: { type: string }
+        lastName: { type: string }
+    VerificationResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        workerId: { type: string, format: uuid }
+        status: { type: string, enum: [SUBMITTED, UNDER_REVIEW, VERIFIED, REJECTED] }
+        submittedAt: { type: string, format: date-time }
+        reviewedAt: { type: string, format: date-time, nullable: true }
+        rejectionReason: { type: string, nullable: true }
+    UpdateProfileRequest:
+      type: object
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+        bio: { type: string, maxLength: 500 }
+        phone: { type: string }
+    OfferingRequest:
+      type: object
+      required: [categoryId, basePrice, estimatedHours]
+      properties:
+        categoryId: { type: string, format: uuid }
+        basePrice: { type: number, format: float, minimum: 0 }
+        estimatedHours: { type: integer, minimum: 1 }
+    Category:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        slug: { type: string }
+        iconKey: { type: string }
+        active: { type: boolean }
+    WorkerSearchResult:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        firstName: { type: string }
+        lastName: { type: string }
+        ratingAvg: { type: number, format: float }
+        totalServices: { type: integer }
+        verified: { type: boolean }
+        topRated: { type: boolean }
+        categories: { type: array, items: { type: string } }
+        districts: { type: array, items: { type: string } }
+        basePriceFrom: { type: number, format: float }
+        distanceKm: { type: number, format: float, nullable: true }
+    WorkerProfileResponse:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        firstName: { type: string }
+        lastName: { type: string }
+        bio: { type: string }
+        ratingAvg: { type: number, format: float }
+        totalServices: { type: integer }
+        verified: { type: boolean }
+        badges:
+          type: array
+          items:
+            type: object
+            properties:
+              type: { type: string, enum: [VERIFIED, TOP_RATED, COURSE_CERTIFIED] }
+              grantedAt: { type: string, format: date-time }
+        offerings:
+          type: array
+          items: { $ref: '#/components/schemas/OfferingResponse' }
+        coverageDistricts:
+          type: array
+          items: { type: string }
+        recentReviews:
+          type: array
+          items:
+            type: object
+            properties:
+              rating: { type: integer }
+              comment: { type: string }
+              customerInitial: { type: string }
+              publishedAt: { type: string, format: date-time }
+        isNew: { type: boolean }
+    OfferingResponse:
+      type: object
+      properties:
+        category: { type: string }
+        basePrice: { type: number, format: float }
+        estimatedHours: { type: integer }
