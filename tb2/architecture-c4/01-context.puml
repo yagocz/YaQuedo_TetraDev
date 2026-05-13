@@ -6,35 +6,25 @@ title Diagrama de Contexto · Ya Quedó (Nivel 1 · C4 Model)
 
 ' ============ Personas / Actores ============
 Person(cliente, "Cliente", "Persona de Lima Metropolitana (25-55 años, NSE B/C) que requiere servicios técnicos del hogar.")
-Person(trabajador, "Trabajador Independiente", "Técnico (electricista, gasfitero, pintor, cerrajero) entre 22-60 años que ofrece servicios.")
-Person(soporte, "Equipo de Soporte TetraDev", "Modera disputas, resuelve reclamos y verifica documentos rechazados.")
+Person(trabajador, "Trabajador Independiente", "Técnico (electricista, gasfitero, pintor, cerrajero) de 22-60 años que ofrece sus servicios.")
+Person(soporte, "Equipo de Soporte TetraDev", "Modera, resuelve reclamos y verifica manualmente los documentos de identidad enviados por los trabajadores.")
 
 ' ============ Sistema principal ============
-System(yaQuedo, "Plataforma Ya Quedó", "Marketplace digital que conecta clientes con trabajadores independientes verificados, gestionando cotizaciones, pagos intermediados, reseñas y capacitaciones.")
+System(yaQuedo, "Plataforma Ya Quedó", "Marketplace digital que conecta clientes con trabajadores técnicos verificados. Cubre el ciclo completo: registro y login (US-01, US-02), búsqueda con filtros y visualización de perfiles (US-03 a US-05), solicitud-aceptación-agenda-confirmación de servicios (US-06 a US-09) y sistema de calificaciones y reputación (US-10, US-11).")
 
-' ============ Sistemas externos ============
-System_Ext(yapeApi, "Yape API", "Procesador de pagos móviles en Perú.")
-System_Ext(niubizApi, "Niubiz Gateway", "Pasarela de tarjetas Visa/Mastercard/Amex.")
-System_Ext(reniecApi, "RENIEC API\n(vía proveedor)", "Verificación de identidad mediante DNI peruano.")
-System_Ext(smsApi, "Twilio SMS", "Envío de códigos OTP y notificaciones por SMS.")
-System_Ext(emailApi, "SendGrid", "Envío de correos transaccionales y de marketing.")
-System_Ext(mapsApi, "Google Maps API", "Geolocalización y autocompletado de direcciones.")
-System_Ext(ga4, "Google Analytics 4", "Analítica de uso y eventos de marketing.")
-System_Ext(s3, "Amazon S3 / Cloudinary", "Almacenamiento de fotos de DNI, perfiles y trabajos.")
+' ============ Sistemas externos (todos gratuitos / accesibles) ============
+System_Ext(emailApi, "Servicio de Correo\n(SMTP o SendGrid free tier)", "Envío de OTP de registro y notificaciones transaccionales por email.")
+System_Ext(osm, "OpenStreetMap", "Tiles de mapas gratuitos para mostrar cobertura del trabajador (vía Leaflet.js).")
+System_Ext(ga4, "Google Analytics 4", "Analítica de uso y eventos del landing.")
 
 ' ============ Relaciones Persona → Sistema ============
 Rel(cliente, yaQuedo, "Busca, contrata y califica servicios", "HTTPS")
-Rel(trabajador, yaQuedo, "Recibe solicitudes, gestiona perfil y cobros", "HTTPS")
-Rel(soporte, yaQuedo, "Modera, verifica documentos, resuelve disputas", "HTTPS")
+Rel(trabajador, yaQuedo, "Publica perfil, recibe solicitudes, gestiona cobros", "HTTPS")
+Rel(soporte, yaQuedo, "Revisa documentos, modera reseñas, resuelve disputas", "HTTPS")
 
 ' ============ Relaciones Sistema → Externos ============
-Rel(yaQuedo, yapeApi, "Procesa pagos móviles", "HTTPS / REST")
-Rel(yaQuedo, niubizApi, "Procesa pagos con tarjeta", "HTTPS / REST")
-Rel(yaQuedo, reniecApi, "Verifica DNI del trabajador", "HTTPS / REST")
-Rel(yaQuedo, smsApi, "Envía OTP y notificaciones", "HTTPS / REST")
-Rel(yaQuedo, emailApi, "Envía correos transaccionales", "HTTPS / REST")
-Rel(yaQuedo, mapsApi, "Geocodifica direcciones", "HTTPS / REST")
-Rel(yaQuedo, ga4, "Reporta eventos de uso", "HTTPS")
-Rel(yaQuedo, s3, "Almacena imágenes (DNI, fotos)", "HTTPS / S3 API")
+Rel(yaQuedo, emailApi, "Envía OTP y correos transaccionales", "SMTP / REST")
+Rel(yaQuedo, osm, "Renderiza tiles de mapas en la app", "HTTPS")
+Rel(yaQuedo, ga4, "Reporta eventos de uso del landing", "HTTPS")
 
 @enduml

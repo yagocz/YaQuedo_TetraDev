@@ -1,6 +1,8 @@
 # Diagramas C4 · versiones Mermaid
 
-Estos bloques se renderizan **automáticamente en GitHub, GitLab, Notion, Obsidian** y la mayoría de visores Markdown modernos. Si quieres exportar PNG/SVG, usa https://mermaid.live (pega el código entre `mermaid` y obtienes la imagen).
+Estos bloques se renderizan **automáticamente en GitHub, GitLab, Notion, Obsidian** y la mayoría de visores Markdown modernos. Si quieres exportar PNG/SVG, usa https://mermaid.live (pega el código entre ```mermaid ... ``` y obtienes la imagen).
+
+> **Nota TB2 (2026-05-12)**: se removieron del alcance las integraciones de pago (Yape, Niubiz) y verificación automática RENIEC porque no son accesibles para el equipo. La verificación de identidad ahora la hace manualmente el **Equipo de Soporte** revisando las fotos en MinIO. Para mapas se usa **OpenStreetMap + Leaflet.js** (gratuito). OTPs se envían por **email SMTP** (SendGrid free tier o Gmail App Password) en lugar de SMS Twilio.
 
 ---
 
@@ -12,33 +14,23 @@ flowchart TB
     classDef system fill:#1168BD,stroke:#0E5BA6,color:#fff
     classDef external fill:#999999,stroke:#6B6B6B,color:#fff
 
-    cliente["👤 Cliente<br/>Persona Lima Metro<br/>25-55 años, NSE B/C"]:::person
-    trabajador["👤 Trabajador Independiente<br/>Técnico 22-60 años"]:::person
-    soporte["👤 Equipo Soporte TetraDev"]:::person
+    cliente["Cliente<br/>Persona Lima Metro<br/>25-55, NSE B/C"]:::person
+    trabajador["Trabajador<br/>Técnico independiente<br/>22-60 años"]:::person
+    soporte["Soporte TetraDev<br/>Revisa documentos<br/>manualmente"]:::person
 
-    yaQuedo["🏠 Plataforma Ya Quedó<br/>Marketplace de servicios técnicos<br/>del hogar en Perú"]:::system
+    yaQuedo["Plataforma Ya Quedó<br/>Marketplace de servicios técnicos<br/>Registro · Búsqueda · Solicitud<br/>Agenda · Confirmación · Reseñas<br/>(11 US del segmento cliente)"]:::system
 
-    yape["💜 Yape API<br/>Pagos móviles"]:::external
-    niubiz["💳 Niubiz Gateway<br/>Pagos tarjeta"]:::external
-    reniec["🪪 RENIEC API<br/>Verificación DNI"]:::external
-    twilio["📱 Twilio<br/>SMS / OTP"]:::external
-    sendgrid["📧 SendGrid<br/>Correos"]:::external
-    maps["🗺 Google Maps<br/>Geocoding"]:::external
-    ga4["📊 Google Analytics 4"]:::external
-    s3["☁️ Amazon S3<br/>Imágenes"]:::external
+    email["Servicio de Correo<br/>SMTP / SendGrid free"]:::external
+    osm["OpenStreetMap<br/>Tiles gratis<br/>vía Leaflet.js"]:::external
+    ga4["Google Analytics 4"]:::external
 
     cliente -- "Busca, contrata, califica" --> yaQuedo
-    trabajador -- "Recibe solicitudes, gestiona perfil" --> yaQuedo
-    soporte -- "Modera, verifica, resuelve disputas" --> yaQuedo
+    trabajador -- "Publica perfil, recibe solicitudes" --> yaQuedo
+    soporte -- "Aprueba/rechaza verificaciones" --> yaQuedo
 
-    yaQuedo -- "Procesa pagos Yape" --> yape
-    yaQuedo -- "Procesa pagos tarjeta" --> niubiz
-    yaQuedo -- "Verifica DNI" --> reniec
-    yaQuedo -- "Envía OTP" --> twilio
-    yaQuedo -- "Envía correos" --> sendgrid
-    yaQuedo -- "Geocodifica" --> maps
+    yaQuedo -- "Envía OTP y notifs" --> email
+    yaQuedo -- "Renderiza mapas" --> osm
     yaQuedo -- "Reporta eventos" --> ga4
-    yaQuedo -- "Sube/recupera imágenes" --> s3
 ```
 
 ---
@@ -52,49 +44,43 @@ flowchart TB
     classDef db fill:#438DD5,stroke:#3373AC,color:#fff,stroke-dasharray:5 5
     classDef external fill:#999999,stroke:#6B6B6B,color:#fff
 
-    cliente["👤 Cliente"]:::person
-    trabajador["👤 Trabajador"]:::person
+    cliente["Cliente"]:::person
+    trabajador["Trabajador"]:::person
+    soporte["Soporte"]:::person
 
-    subgraph YaQuedo["🏠 Plataforma Ya Quedó"]
-        landing["🌐 Landing Page<br/>HTML5 + CSS3 + JS"]:::container
-        webApp["📱 Web Application<br/>Angular 17 + TypeScript"]:::container
-        api["⚙️ Web Services API<br/>Spring Boot 3.2 + Java 21"]:::container
-        db[("🗄 PostgreSQL 16<br/>Datos relacionales")]:::db
-        cache[("⚡ Redis 7<br/>Sesiones / Cache")]:::db
-        storage["☁️ File Storage<br/>S3 / Cloudinary"]:::container
+    subgraph YaQuedo["Plataforma Ya Quedó"]
+        landing["Landing Page<br/>HTML5 + CSS3 + JS"]:::container
+        webApp["Web Application<br/>Angular 17 + TS"]:::container
+        api["Web Services API<br/>Spring Boot 3.2 + Java 21<br/>6 Bounded Contexts · 24 endpoints"]:::container
+        db[("PostgreSQL 16<br/>10 tablas")]:::db
+        cache[("Redis 7<br/>OTP / rate-limit")]:::db
+        storage["MinIO<br/>S3-compatible local"]:::container
     end
 
-    yape["💜 Yape API"]:::external
-    niubiz["💳 Niubiz"]:::external
-    reniec["🪪 RENIEC"]:::external
-    twilio["📱 Twilio"]:::external
-    sendgrid["📧 SendGrid"]:::external
-    maps["🗺 Google Maps"]:::external
-    ga4["📊 GA4"]:::external
+    email["SMTP / SendGrid free"]:::external
+    osm["OpenStreetMap"]:::external
+    ga4["GA4"]:::external
 
     cliente --> landing
     cliente --> webApp
     trabajador --> landing
     trabajador --> webApp
+    soporte --> webApp
 
     landing --> ga4
     landing -- "POST /pre-register" --> api
     webApp -- "JWT + JSON" --> api
+    webApp --> osm
 
     api --> db
     api --> cache
     api --> storage
-    api --> yape
-    api --> niubiz
-    api --> reniec
-    api --> twilio
-    api --> sendgrid
-    api --> maps
+    api -- "OTP + notifs por SMTP" --> email
 ```
 
 ---
 
-## Nivel 3 · Component Diagram (Backend Spring Boot)
+## Nivel 3 · Component Diagram (Backend Spring Boot · 6 Bounded Contexts)
 
 ```mermaid
 flowchart TB
@@ -103,13 +89,14 @@ flowchart TB
     classDef external fill:#999999,stroke:#6B6B6B,color:#fff
     classDef db fill:#438DD5,stroke:#3373AC,color:#fff,stroke-dasharray:5 5
 
-    webApp["📱 Web Application<br/>Angular SPA"]:::container
+    webApp["Web Application<br/>Angular SPA"]:::container
 
-    subgraph API["⚙️ Web Services · Spring Boot 3.2"]
+    subgraph API["Web Services · Spring Boot 3.2"]
 
         subgraph IAM["IAM"]
             authCtrl["AuthController"]:::component
             authSvc["AuthenticationService"]:::component
+            otpSvc["OtpService"]:::component
             jwt["JwtTokenProvider"]:::component
             userRepo["UserRepository"]:::component
         end
@@ -117,137 +104,93 @@ flowchart TB
         subgraph Identity["Identity"]
             verifCtrl["VerificationController"]:::component
             verifSvc["VerificationService"]:::component
-            reniecAdapter["ReniecAdapter"]:::component
+            minioAd["MinioStorageAdapter"]:::component
             verifRepo["VerificationRepository"]:::component
         end
 
         subgraph Catalog["Catalog"]
             catCtrl["CategoryController"]:::component
-            catSvc["CategoryService"]:::component
             catRepo["CategoryRepository"]:::component
         end
 
-        subgraph Worker["Worker"]
+        subgraph Worker["Worker (US-03, US-04, US-05)"]
             wkCtrl["WorkerController"]:::component
-            wkSvc["WorkerProfileService"]:::component
+            wkProf["WorkerProfileService"]:::component
             wkSearch["WorkerSearchService"]:::component
-            wkRepo["WorkerRepository"]:::component
+            wkRepo["Worker*Repository"]:::component
         end
 
-        subgraph Booking["Booking"]
-            qCtrl["QuoteController"]:::component
-            bkCtrl["BookingController"]:::component
-            qSvc["QuoteService"]:::component
-            bkSvc["BookingService"]:::component
-            qRepo["QuoteRepository"]:::component
-            bkRepo["BookingRepository"]:::component
+        subgraph Booking["Booking (US-06 a US-09)"]
+            srCtrl["ServiceRequestController"]:::component
+            srSvc["ServiceRequestService"]:::component
+            srRepo["ServiceRequestRepository"]:::component
+            srAgg["ServiceRequest aggregate"]:::component
         end
 
-        subgraph Payment["Payment"]
-            payCtrl["PaymentController"]:::component
-            paySvc["PaymentService"]:::component
-            yapeAd["YapeAdapter"]:::component
-            niubizAd["NiubizAdapter"]:::component
-            payRepo["PaymentRepository"]:::component
-        end
-
-        subgraph Reputation["Reputation"]
+        subgraph Reputation["Reputation (US-10, US-11)"]
             revCtrl["ReviewController"]:::component
             revSvc["ReviewService"]:::component
-            badge["BadgeService"]:::component
             revRepo["ReviewRepository"]:::component
-        end
-
-        subgraph Training["Training"]
-            crCtrl["CourseController"]:::component
-            crSvc["CourseService"]:::component
-            quizSvc["QuizService"]:::component
-            crRepo["CourseRepository"]:::component
-        end
-
-        subgraph Notification["Notification"]
-            notif["NotificationService"]:::component
-            emailAd["EmailAdapter"]:::component
-            smsAd["SmsAdapter"]:::component
+            revAgg["Review aggregate"]:::component
         end
 
         subgraph CrossCutting["Cross-cutting"]
             sec["SecurityConfig"]:::component
-            audit["AuditAspect"]:::component
             errH["GlobalExceptionHandler"]:::component
+            emailAd["EmailAdapter"]:::component
+            openapi["OpenApiConfig"]:::component
         end
     end
 
-    db[("🗄 PostgreSQL")]:::db
-    reniec["🪪 RENIEC"]:::external
-    yape["💜 Yape"]:::external
-    niubiz["💳 Niubiz"]:::external
-    twilio["📱 Twilio"]:::external
-    sendgrid["📧 SendGrid"]:::external
+    db[("PostgreSQL 16<br/>10 tablas")]:::db
+    redis[("Redis 7")]:::db
+    storage["MinIO"]:::container
+    emailExt["SMTP / SendGrid"]:::external
 
     webApp --> authCtrl
     webApp --> verifCtrl
     webApp --> catCtrl
     webApp --> wkCtrl
-    webApp --> qCtrl
-    webApp --> bkCtrl
-    webApp --> payCtrl
+    webApp --> srCtrl
     webApp --> revCtrl
-    webApp --> crCtrl
 
     authCtrl --> authSvc
+    authSvc --> otpSvc
     authSvc --> jwt
     authSvc --> userRepo
+    otpSvc --> redis
+    otpSvc --> emailAd
 
     verifCtrl --> verifSvc
-    verifSvc --> reniecAdapter
+    verifSvc --> minioAd
     verifSvc --> verifRepo
-    reniecAdapter --> reniec
+    minioAd --> storage
 
-    catCtrl --> catSvc
-    catSvc --> catRepo
-
-    wkCtrl --> wkSvc
+    catCtrl --> catRepo
+    wkCtrl --> wkProf
     wkCtrl --> wkSearch
-    wkSvc --> wkRepo
+    wkProf --> wkRepo
     wkSearch --> wkRepo
+    wkSearch --> userRepo
 
-    qCtrl --> qSvc
-    bkCtrl --> bkSvc
-    qSvc --> qRepo
-    bkSvc --> bkRepo
-    qSvc --> notif
-
-    payCtrl --> paySvc
-    paySvc --> yapeAd
-    paySvc --> niubizAd
-    paySvc --> payRepo
-    yapeAd --> yape
-    niubizAd --> niubiz
+    srCtrl --> srSvc
+    srSvc --> srRepo
+    srRepo --> srAgg
 
     revCtrl --> revSvc
-    revSvc --> badge
     revSvc --> revRepo
+    revSvc -.->|valida COMPLETED| srSvc
+    revSvc -.->|recalcula ratingAvg| userRepo
+    revRepo --> revAgg
 
-    crCtrl --> crSvc
-    crSvc --> quizSvc
-    crSvc --> crRepo
-    crSvc --> badge
-
-    notif --> emailAd
-    notif --> smsAd
-    emailAd --> sendgrid
-    smsAd --> twilio
+    emailAd --> emailExt
 
     userRepo --> db
     verifRepo --> db
     catRepo --> db
     wkRepo --> db
-    qRepo --> db
-    bkRepo --> db
-    payRepo --> db
+    srRepo --> db
     revRepo --> db
-    crRepo --> db
 ```
 
 ---
@@ -257,5 +200,5 @@ flowchart TB
 1. Copia el bloque `mermaid` que necesites.
 2. Abre https://mermaid.live
 3. Pega el código en el panel izquierdo.
-4. En el panel superior derecho, click en el ícono **"PNG"** o **"SVG"** para descargar.
+4. En el panel superior derecho, click **"PNG"** o **"SVG"** para descargar.
 5. Pega la imagen en el informe Word con su explicación.

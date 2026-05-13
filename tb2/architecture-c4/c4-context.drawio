@@ -1,0 +1,64 @@
+<mxfile host="app.diagrams.net" modified="2026-05-12T18:00:00.000Z" agent="TetraDev" version="22.1.0" type="device">
+  <diagram name="C4-Context-YaQuedo" id="c4-context-yaquedo">
+    <mxGraphModel dx="1422" dy="757" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Diagrama de Contexto · Ya Quedó (Nivel 1 · C4 Model)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="30" width="1200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cliente" value="Cliente&#xa;[Persona]&#xa;&#xa;Persona de Lima Metropolitana (25-55 años, NSE B/C) que requiere servicios técnicos del hogar." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontSize=12;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="180" y="120" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="trabajador" value="Trabajador Independiente&#xa;[Persona]&#xa;&#xa;Técnico (electricista, gasfitero, pintor, cerrajero) de 22-60 años que ofrece sus servicios en la plataforma." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontSize=12;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="680" y="120" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="soporte" value="Equipo de Soporte TetraDev&#xa;[Persona]&#xa;&#xa;Modera disputas, resuelve reclamos y verifica manualmente los documentos de identidad enviados por los trabajadores." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontSize=12;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="1180" y="120" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="yaQuedo" value="Plataforma Ya Quedó&#xa;[Sistema de Software]&#xa;&#xa;Marketplace digital que conecta clientes con trabajadores técnicos verificados, gestiona perfiles, búsquedas filtradas, solicitudes de servicio con flujo de aceptación/agendamiento/confirmación, y un sistema de reseñas y reputación." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1168BD;strokeColor=#0E5BA6;fontColor=#FFFFFF;fontSize=13;align=center;verticalAlign=middle;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="600" y="460" width="400" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="email" value="Servicio de Correo&#xa;(SMTP / SendGrid free)&#xa;[Sistema Externo]&#xa;&#xa;Envío de OTPs de registro y notificaciones transaccionales." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#6B6B6B;fontColor=#FFFFFF;fontSize=12;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="180" y="820" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="osm" value="OpenStreetMap&#xa;[Sistema Externo · Gratuito]&#xa;&#xa;Visualización de mapas para ver ubicación del trabajador y cobertura por distrito (Leaflet.js)." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#6B6B6B;fontColor=#FFFFFF;fontSize=12;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="680" y="820" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="ga4" value="Google Analytics 4&#xa;[Sistema Externo · Gratuito]&#xa;&#xa;Analítica de uso, eventos de marketing en el landing." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#6B6B6B;fontColor=#FFFFFF;fontSize=12;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="1180" y="820" width="240" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="r1" value="Busca, contrata y califica servicios&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;fontSize=11;endArrow=block;endFill=1" edge="1" parent="1" source="cliente" target="yaQuedo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r2" value="Publica perfil, recibe solicitudes&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=11;endArrow=block;endFill=1" edge="1" parent="1" source="trabajador" target="yaQuedo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r3" value="Revisa documentos, modera reseñas&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;fontSize=11;endArrow=block;endFill=1" edge="1" parent="1" source="soporte" target="yaQuedo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r4" value="Envía OTP y notificaciones&#xa;[SMTP]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=11;endArrow=block;endFill=1" edge="1" parent="1" source="yaQuedo" target="email">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r5" value="Renderiza tiles de mapas&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=11;endArrow=block;endFill=1" edge="1" parent="1" source="yaQuedo" target="osm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r6" value="Reporta eventos de uso&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=11;endArrow=block;endFill=1" edge="1" parent="1" source="yaQuedo" target="ga4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="legend" value="LEYENDA · C4 Model Nivel 1&#xa;&#xa;◼ Persona / Actor humano&#xa;◼ Sistema en alcance (Ya Quedó)&#xa;◼ Sistema externo (gratuito o de terceros)&#xa;&#xa;Cada flecha indica:&#xa;  · qué hace el origen sobre el destino&#xa;  · protocolo entre [corchetes]" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#F3F4F6;strokeColor=#6B7280;spacingLeft=12;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="500" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="legendColor1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F" vertex="1" parent="1">
+          <mxGeometry x="60" y="520" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legendColor2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1168BD;strokeColor=#0E5BA6" vertex="1" parent="1">
+          <mxGeometry x="60" y="545" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legendColor3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#6B6B6B" vertex="1" parent="1">
+          <mxGeometry x="60" y="570" width="20" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
