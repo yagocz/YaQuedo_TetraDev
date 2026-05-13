@@ -1,0 +1,264 @@
+{
+  "info": {
+    "name": "Ya Quedo - Web Services API (Sprint 2)",
+    "description": "Coleccion Postman con los 12 endpoints REST del Sprint 2 de YaQuedo (TB2). Cubre IAM, Identity, Catalog y Worker.\n\nUso:\n1. Importa este archivo en Postman.\n2. Selecciona el environment `YaQuedo Local`.\n3. Ejecuta primero `Auth · Register` y `Auth · OTP Verify` para obtener un JWT.\n4. El JWT queda guardado en la variable `accessToken` y se inyecta automaticamente en los endpoints protegidos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "yaquedo-tb2-sprint2-collection"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "workerId", "value": "" },
+    { "key": "verificationId", "value": "" },
+    { "key": "categoryIdElec", "value": "" },
+    { "key": "districtIdSanMiguel", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{accessToken}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "1. IAM - Auth",
+      "item": [
+        {
+          "name": "Register (POST /auth/register)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.userId) pm.collectionVariables.set('userId', json.data.userId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.test@correo.com\",\n  \"phone\": \"+51987654321\",\n  \"password\": \"P@ssw0rd123\",\n  \"firstName\": \"Maria Carmen\",\n  \"lastName\": \"Rodriguez\",\n  \"userType\": \"WORKER\"\n}"
+            }
+          }
+        },
+        {
+          "name": "OTP Verify (POST /auth/otp/verify)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.data) {",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/otp/verify", "host": ["{{baseUrl}}"], "path": ["auth", "otp", "verify"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"code\": \"123456\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login (POST /auth/login)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (json.data) {",
+                  "  pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "  pm.collectionVariables.set('refreshToken', json.data.refreshToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.test@correo.com\",\n  \"password\": \"P@ssw0rd123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Recover Password (POST /auth/recover)",
+          "request": {
+            "method": "POST",
+            "auth": { "type": "noauth" },
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/auth/recover", "host": ["{{baseUrl}}"], "path": ["auth", "recover"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"email\": \"maria.test@correo.com\" }"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Identity - Verification",
+      "item": [
+        {
+          "name": "Submit Identity Verification (POST /workers/{id}/verify-identity)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 201', () => pm.response.to.have.status(201));",
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.verificationId) pm.collectionVariables.set('verificationId', json.data.verificationId);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{baseUrl}}/workers/{{workerId}}/verify-identity", "host": ["{{baseUrl}}"], "path": ["workers", "{{workerId}}", "verify-identity"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "dniFront", "type": "file", "src": [] },
+                { "key": "dniBack", "type": "file", "src": [] },
+                { "key": "selfie", "type": "file", "src": [] }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Verification Status (GET /verifications/{id})",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/verifications/{{verificationId}}", "host": ["{{baseUrl}}"], "path": ["verifications", "{{verificationId}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Catalog",
+      "item": [
+        {
+          "name": "List Categories (GET /categories)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "const json = pm.response.json();",
+                  "if (Array.isArray(json.data) && json.data.length > 0) {",
+                  "  const elec = json.data.find(c => c.slug === 'electricidad');",
+                  "  if (elec) pm.collectionVariables.set('categoryIdElec', elec.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Worker",
+      "item": [
+        {
+          "name": "Update Profile (PUT /workers/me)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/workers/me", "host": ["{{baseUrl}}"], "path": ["workers", "me"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Maria Carmen\",\n  \"lastName\": \"Rodriguez\",\n  \"bio\": \"Electricista con 12 anios de experiencia.\",\n  \"phone\": \"+51987654321\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Offerings (POST /workers/me/offerings)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/workers/me/offerings", "host": ["{{baseUrl}}"], "path": ["workers", "me", "offerings"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"offerings\": [\n    { \"categoryId\": \"{{categoryIdElec}}\", \"basePrice\": 80.00, \"estimatedHours\": 2 }\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Coverage (PUT /workers/me/coverage)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/workers/me/coverage", "host": ["{{baseUrl}}"], "path": ["workers", "me", "coverage"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"districtIds\": [\"{{districtIdSanMiguel}}\"]\n}"
+            }
+          }
+        },
+        {
+          "name": "Search Workers (GET /workers/search)",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": {
+              "raw": "{{baseUrl}}/workers/search?categoryId={{categoryIdElec}}&districtId={{districtIdSanMiguel}}&minRating=4&page=0&size=20&sort=rating",
+              "host": ["{{baseUrl}}"],
+              "path": ["workers", "search"],
+              "query": [
+                { "key": "categoryId", "value": "{{categoryIdElec}}" },
+                { "key": "districtId", "value": "{{districtIdSanMiguel}}" },
+                { "key": "minRating", "value": "4" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "sort", "value": "rating" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Worker Profile (GET /workers/{id})",
+          "request": {
+            "method": "GET",
+            "auth": { "type": "noauth" },
+            "url": { "raw": "{{baseUrl}}/workers/{{workerId}}", "host": ["{{baseUrl}}"], "path": ["workers", "{{workerId}}"] }
+          }
+        }
+      ]
+    }
+  ]
+}
