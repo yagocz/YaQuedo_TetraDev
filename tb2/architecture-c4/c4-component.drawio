@@ -1,0 +1,177 @@
+<mxfile host="app.diagrams.net" modified="2026-05-12T20:00:00.000Z" agent="TetraDev" version="22.1.0" type="device">
+  <diagram name="C4-Component-YaQuedo-Backend" id="c4-component-yaquedo">
+    <mxGraphModel dx="1422" dy="757" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="2000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Diagrama de Componentes · Backend Ya Quedó (Nivel 3 · C4 Model) — 6 Bounded Contexts (11 User Stories)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="2000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="webApp" value="Web Application&#xa;[Container: Angular SPA]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=12;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="80" y="120" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="bcIAM" value="Bounded Context · IAM (US-01, US-02)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#EEF2FF;strokeColor=#6366F1;fontSize=13;fontStyle=1;verticalAlign=top;align=center;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="400" y="120" width="700" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="authCtrl" value="AuthController&#xa;[@RestController]&#xa;POST /auth/register&#xa;POST /auth/otp/verify&#xa;POST /auth/login&#xa;POST /auth/recover" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="420" y="170" width="180" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="authSvc" value="AuthenticationService&#xa;[@Service]&#xa;BCrypt cost 12&#xa;Emite JWT" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="620" y="170" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="otpSvc" value="OtpService&#xa;[@Service]&#xa;6 dígitos · Redis TTL 5min" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="800" y="170" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="jwt" value="JwtTokenProvider&#xa;[@Component]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="620" y="270" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="userRepo" value="UserRepository&#xa;[@Repository]&#xa;findByEmail" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="800" y="270" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcCat" value="Bounded Context · Catalog (apoyo US-03)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#DCFCE7;strokeColor=#16A34A;fontSize=13;fontStyle=1;verticalAlign=top;align=center;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="1140" y="120" width="500" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="catCtrl" value="CategoryController&#xa;[@RestController]&#xa;GET /categories" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1160" y="170" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="catRepo" value="CategoryRepository&#xa;[@Repository]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1340" y="170" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="distRepo" value="DistrictRepository&#xa;[@Repository]&#xa;15 distritos seed" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1340" y="270" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcId" value="Bounded Context · Identity (auxiliar)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#D97706;fontSize=13;fontStyle=1;verticalAlign=top;align=center;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="1680" y="120" width="660" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="verifCtrl" value="VerificationController&#xa;[@RestController]&#xa;POST /workers/{id}/verify-identity&#xa;GET /verifications/{id}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1700" y="170" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="verifSvc" value="VerificationService&#xa;[@Service]&#xa;Valida JPEG/PNG ≤5MB" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1920" y="170" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="minio" value="MinioStorageAdapter&#xa;[@Component]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="2120" y="170" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="verifRepo" value="VerificationRepository&#xa;[@Repository]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1920" y="270" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcWk" value="Bounded Context · Worker (US-03, US-04, US-05)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FCE7F3;strokeColor=#DB2777;fontSize=13;fontStyle=1;verticalAlign=top;align=center;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="400" y="400" width="940" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="wkCtrl" value="WorkerController&#xa;[@RestController]&#xa;PUT /workers/me&#xa;POST /workers/me/offerings&#xa;PUT /workers/me/coverage&#xa;GET /workers/search&#xa;GET /workers/{id}" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="420" y="450" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="wkProf" value="WorkerProfileService&#xa;[@Service]&#xa;Máx 10 oficios" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="640" y="450" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="wkSearch" value="WorkerSearchService&#xa;[@Service]&#xa;Filtros + fallback" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="840" y="450" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="wkOffRepo" value="WorkerOfferingRepo&#xa;[@Repository]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1040" y="450" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wkCovRepo" value="WorkerCoverageRepo&#xa;[@Repository]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1040" y="530" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcBook" value="Bounded Context · Booking (US-06, US-07, US-08, US-09)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E0F2FE;strokeColor=#0369A1;fontSize=13;fontStyle=1;verticalAlign=top;align=center;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="1380" y="400" width="960" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="srCtrl" value="ServiceRequestController&#xa;[@RestController]&#xa;POST /service-requests&#xa;GET /me, /inbox, /{id}&#xa;POST /{id}/accept&#xa;POST /{id}/reject&#xa;POST /{id}/schedule&#xa;POST /{id}/confirm&#xa;POST /{id}/complete" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1400" y="450" width="220" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="srSvc" value="ServiceRequestService&#xa;[@Service]&#xa;State machine&#xa;Máx 3 activas / worker&#xa;Genera código 6 chars" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1640" y="450" width="220" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="srRepo" value="ServiceRequestRepository&#xa;[@Repository]&#xa;findByCustomerId&#xa;findByWorkerId&#xa;countByWorkerAndStatus" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1880" y="450" width="220" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="srAgg" value="ServiceRequest&#xa;[Aggregate root]&#xa;PENDING → ACCEPTED&#xa;→ SCHEDULED → CONFIRMED&#xa;→ COMPLETED" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="2120" y="450" width="200" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="bcRep" value="Bounded Context · Reputation (US-10, US-11)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FEE2E2;strokeColor=#DC2626;fontSize=13;fontStyle=1;verticalAlign=top;align=center;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="400" y="680" width="1180" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="revCtrl" value="ReviewController&#xa;[@RestController]&#xa;POST /reviews&#xa;POST /reviews/{id}/respond&#xa;GET /workers/{id}/reviews" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="420" y="730" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="revSvc" value="ReviewService&#xa;[@Service]&#xa;Valida estado COMPLETED&#xa;Anti-duplicado&#xa;Recalcula ratingAvg" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="660" y="730" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="revRepo" value="ReviewRepository&#xa;[@Repository]&#xa;findByWorkerIdOrderBy&#xa;findByServiceRequestId" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="900" y="730" width="220" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="revAgg" value="Review&#xa;[Aggregate]&#xa;rating 1-5&#xa;workerResponse opcional&#xa;UNIQUE(serviceRequestId)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="1140" y="730" width="200" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="bcXC" value="Cross-cutting · Configuration · Storage · Email" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F1F5F9;strokeColor=#64748B;fontSize=13;fontStyle=1;verticalAlign=top;align=center;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="1620" y="680" width="720" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="security" value="SecurityConfig&#xa;[@Configuration]&#xa;JWT stateless&#xa;BCrypt · CORS" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1640" y="730" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="excH" value="GlobalExceptionHandler&#xa;[@RestControllerAdvice]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1820" y="730" width="180" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="emailAd" value="EmailAdapter&#xa;[@Component]&#xa;OTP + notifs por SMTP" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="2020" y="730" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="openapi" value="OpenApiConfig&#xa;[@Configuration]&#xa;Swagger UI" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1640" y="820" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="apiResp" value="ApiResponse&lt;T&gt;&#xa;[shared-kernel]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="1820" y="820" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="excs" value="Domain Exceptions&#xa;[shared-kernel]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#85BBF0;strokeColor=#5D82A8;fontSize=10;align=center" vertex="1" parent="1">
+          <mxGeometry x="2020" y="820" width="160" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="PostgreSQL 16&#xa;[ContainerDb]&#xa;8+ tablas" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=12;align=center" vertex="1" parent="1">
+          <mxGeometry x="80" y="960" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="redis" value="Redis 7&#xa;[ContainerDb]&#xa;OTP + rate-limit" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=12;align=center" vertex="1" parent="1">
+          <mxGeometry x="400" y="960" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="storage" value="MinIO&#xa;[Container · S3 local]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=12;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="720" y="960" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="emailExt" value="Email Service&#xa;[Externo · SMTP gratis]" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#6B6B6B;fontColor=#FFFFFF;fontSize=12;align=center" vertex="1" parent="1">
+          <mxGeometry x="1040" y="960" width="240" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="rW_IAM" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="webApp" target="authCtrl"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rW_Cat" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="webApp" target="catCtrl"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rW_Wk" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.8;exitY=1;exitDx=0;exitDy=0;entryX=0.1;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="webApp" target="wkCtrl"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rW_Book" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.9;exitY=1;exitDx=0;exitDy=0;entryX=0.05;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="webApp" target="srCtrl"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rW_Rev" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.1;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="webApp" target="revCtrl"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rA1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="authCtrl" target="authSvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rA2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="authSvc" target="otpSvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rA3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="authSvc" target="jwt"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rA4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="otpSvc" target="userRepo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rC1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="catCtrl" target="catRepo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rI1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="verifCtrl" target="verifSvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rI2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="verifSvc" target="minio"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rWk1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="wkCtrl" target="wkProf"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rWk2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.7;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="wkCtrl" target="wkSearch"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rWk3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="wkProf" target="wkOffRepo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rWk4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="wkSearch" target="wkCovRepo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rB1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="srCtrl" target="srSvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rB2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="srSvc" target="srRepo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rB3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="srRepo" target="srAgg"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rR1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="revCtrl" target="revSvc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rR2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="revSvc" target="revRepo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rR3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="revRepo" target="revAgg"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rR4" value="lee&#xa;ServiceRequest" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;fontSize=10;endArrow=open;endFill=0" edge="1" parent="1" source="revSvc" target="srAgg"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rR5" value="actualiza&#xa;ratingAvg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;fontSize=10;endArrow=open;endFill=0" edge="1" parent="1" source="revSvc" target="userRepo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rDB_user" value="JDBC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="userRepo" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rDB_cat" value="JDBC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="catRepo" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rDB_wk" value="JDBC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="wkOffRepo" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rDB_book" value="JDBC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="srRepo" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rDB_rev" value="JDBC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="revRepo" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rDB_redis" value="OTP TTL" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="otpSvc" target="redis"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rDB_minio" value="S3 API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="minio" target="storage"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="rDB_email" value="SMTP" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="emailAd" target="emailExt"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="legend" value="LEYENDA · C4 Nivel 3 (6 Bounded Contexts)&#xa;&#xa;Colores por contexto:&#xa;◼ IAM (violeta · US-01, US-02)&#xa;◼ Catalog (verde · apoyo US-03)&#xa;◼ Identity (ámbar · auxiliar)&#xa;◼ Worker (rosa · US-03, US-04, US-05)&#xa;◼ Booking (celeste · US-06–US-09)&#xa;◼ Reputation (rojo claro · US-10, US-11)&#xa;◼ Cross-cutting (gris)&#xa;&#xa;Línea punteada = colaboración entre contexts&#xa;Línea sólida = llamada dentro del context" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#F3F4F6;strokeColor=#6B7280;spacingLeft=12;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="1340" y="960" width="600" height="240" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

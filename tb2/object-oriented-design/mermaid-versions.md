@@ -1,200 +1,200 @@
-# Diagramas OO · versiones Mermaid
+# Diagramas OO · versiones Mermaid (alcance TB2)
 
-Render directo en GitHub o https://mermaid.live
+> Estos diagramas reflejan el alcance del Sprint 2: **6 Bounded Contexts y 10 tablas** cubriendo las **11 User Stories** del segmento "Usuario que Contrata". Payment quedó fuera del alcance al remover Yape y Niubiz; identity verification es manual (sin RENIEC).
 
 ---
 
-## Class Diagram
+## Diagrama de Clases · Dominio Ya Quedó (TB2)
 
 ```mermaid
 classDiagram
+    direction TB
+
     class User {
         <<abstract>>
-        -UUID id
-        -String email
-        -String passwordHash
-        -String phone
-        -UserStatus status
-        -LocalDateTime createdAt
-        +login(password) JwtToken
-        +changePassword(old, new) void
+        -id : UUID
+        -email : String
+        -passwordHash : String
+        -phone : String
+        -status : UserStatus
+        -createdAt : LocalDateTime
+        -lastLoginAt : LocalDateTime
+        +activate() void
+        +recordLogin() void
+        +getUserType() String
     }
+
     class Customer {
-        -String firstName
-        -String lastName
-        -District defaultDistrict
-        +addAddress(addr) void
+        -firstName : String
+        -lastName : String
     }
+
     class Worker {
-        -String firstName
-        -String lastName
-        -String dni
-        -String bio
-        -BigDecimal ratingAvg
-        -int totalServices
-        -boolean verified
+        -firstName : String
+        -lastName : String
+        -dni : String
+        -bio : String
+        -ratingAvg : BigDecimal
+        -totalServices : int
+        -verified : boolean
         +isTopRated() boolean
-        +recalculateRating() void
+        +markVerified() void
     }
+
+    class UserStatus {
+        <<enumeration>>
+        PENDING_VERIFICATION
+        ACTIVE
+        SUSPENDED
+        BLOCKED
+    }
+
     class IdentityVerification {
-        -UUID id
-        -UUID workerId
-        -String dniFrontUrl
-        -String selfieUrl
-        -VerificationStatus status
-        -LocalDateTime reviewedAt
-        +submit() void
-        +approve(reviewer) void
+        -id : UUID
+        -workerId : UUID
+        -dniFrontUrl : String
+        -dniBackUrl : String
+        -selfieUrl : String
+        -status : VerificationStatus
+        -submittedAt : LocalDateTime
+        -reviewedAt : LocalDateTime
+        -rejectionReason : String
+        +approve() void
         +reject(reason) void
     }
+
+    class VerificationStatus {
+        <<enumeration>>
+        SUBMITTED
+        UNDER_REVIEW
+        VERIFIED
+        REJECTED
+    }
+
     class ServiceCategory {
-        -UUID id
-        -String name
-        -String slug
-        -boolean active
+        -id : UUID
+        -name : String
+        -slug : String
+        -iconKey : String
+        -active : boolean
     }
-    class WorkerOffering {
-        -UUID id
-        -UUID workerId
-        -UUID categoryId
-        -Money basePrice
-        -int estimatedHours
-    }
+
     class District {
-        -UUID id
-        -String name
-        -String region
+        -id : UUID
+        -name : String
+        -region : String
+        -ubigeo : String
     }
-    class Quote {
-        -UUID id
-        -UUID customerId
-        -UUID workerId
-        -String description
-        -Urgency urgency
-        -QuoteStatus status
-        -Money amount
-        +respond(amount, hours, date) void
-        +accept() Booking
-        +expire() void
+
+    class WorkerOffering {
+        -id : UUID
+        -workerId : UUID
+        -categoryId : UUID
+        -basePrice : BigDecimal
+        -estimatedHours : int
+        -active : boolean
     }
-    class Booking {
-        -UUID id
-        -UUID quoteId
-        -LocalDateTime scheduledAt
-        -BookingStatus status
+
+    class WorkerCoverage {
+        -id : UUID
+        -workerId : UUID
+        -districtId : UUID
+    }
+
+    class ServiceRequest {
+        -id : UUID
+        -customerId : UUID
+        -workerId : UUID
+        -categoryId : UUID
+        -districtId : UUID
+        -description : String
+        -urgency : Urgency
+        -status : ServiceRequestStatus
+        -agreedAmount : BigDecimal
+        -scheduledAt : LocalDateTime
+        -confirmationCode : String
+        -createdAt : LocalDateTime
+        +accept(amount) void
+        +reject(reason) void
+        +schedule(date, code) void
         +confirm() void
         +complete() void
-        +cancel(reason) void
     }
-    class Payment {
-        -UUID id
-        -UUID bookingId
-        -PaymentMethod method
-        -Money amount
-        -Money commission
-        -Money netAmount
-        -PaymentStatus status
-        +capture() void
-        +release() void
-        +refund(reason) void
+
+    class ServiceRequestStatus {
+        <<enumeration>>
+        PENDING
+        ACCEPTED
+        REJECTED
+        SCHEDULED
+        CONFIRMED
+        COMPLETED
+        CANCELLED
+        EXPIRED
     }
+
+    class Urgency {
+        <<enumeration>>
+        URGENT
+        THIS_WEEK
+        NO_RUSH
+    }
+
     class Review {
-        -UUID id
-        -UUID bookingId
-        -int rating
-        -String comment
-        -String response
-        +publish() void
+        -id : UUID
+        -serviceRequestId : UUID
+        -customerId : UUID
+        -workerId : UUID
+        -rating : int
+        -comment : String
+        -workerResponse : String
+        -flagged : boolean
+        -publishedAt : LocalDateTime
         +respond(text) void
-    }
-    class Badge {
-        -UUID id
-        -UUID workerId
-        -BadgeType type
-        -LocalDateTime grantedAt
-    }
-    class Course {
-        -UUID id
-        -String title
-        -String videoUrl
-        -int durationMin
-        -int requiredScore
-    }
-    class CourseCompletion {
-        -UUID id
-        -UUID workerId
-        -UUID courseId
-        -int score
-        -boolean passed
-        +grantBadge() Badge
+        +flagAsAbusive() void
     }
 
     User <|-- Customer
     User <|-- Worker
-    Worker "1" -- "0..1" IdentityVerification : verifica
-    Worker "1" -- "0..*" WorkerOffering : ofrece
-    ServiceCategory "1" -- "0..*" WorkerOffering
-    Customer "1" -- "0..*" Quote : crea
-    Worker "1" -- "0..*" Quote : recibe
-    Quote "1" -- "0..1" Booking : genera
-    Booking "1" -- "1" Payment : tiene
-    Booking "1" -- "0..1" Review
-    Worker "1" -- "0..*" Badge
-    Worker "1" -- "0..*" CourseCompletion
-    Course "1" -- "0..*" CourseCompletion
+    User ..> UserStatus
+    IdentityVerification ..> VerificationStatus
+    ServiceRequest ..> ServiceRequestStatus
+    ServiceRequest ..> Urgency
+    Worker "1" --> "0..*" IdentityVerification : valida con
+    Worker "1" --> "0..*" WorkerOffering : ofrece
+    Worker "1" --> "0..*" WorkerCoverage : opera en
+    ServiceCategory "1" --> "0..*" WorkerOffering : tipo de
+    District "1" --> "0..*" WorkerCoverage : cubre
+    Customer "1" --> "0..*" ServiceRequest : crea
+    Worker "1" --> "0..*" ServiceRequest : recibe
+    ServiceCategory "1" --> "0..*" ServiceRequest : referencia
+    ServiceRequest "1" --> "0..1" Review : genera
+    Worker "1" --> "0..*" Review : sobre
 ```
 
 ---
 
-## Database ER (modelo simplificado)
+## Modelo Entidad-Relación · Base de Datos (TB2 — 10 tablas)
 
 ```mermaid
 erDiagram
-    USERS ||--o| CUSTOMERS : "es tipo"
-    USERS ||--o| WORKERS : "es tipo"
-    WORKERS ||--o{ IDENTITY_VERIFICATIONS : "envía"
-    WORKERS ||--o{ WORKER_OFFERINGS : "ofrece"
-    SERVICE_CATEGORIES ||--o{ WORKER_OFFERINGS : "agrupa"
-    WORKERS ||--o{ WORKER_COVERAGE : "opera en"
-    DISTRICTS ||--o{ WORKER_COVERAGE : "es cubierto por"
-    CUSTOMERS ||--o{ ADDRESSES : "tiene"
-    DISTRICTS ||--o{ ADDRESSES : "ubicada en"
-    CUSTOMERS ||--o{ QUOTES : "solicita"
-    WORKERS ||--o{ QUOTES : "recibe"
-    SERVICE_CATEGORIES ||--o{ QUOTES : "es de"
-    QUOTES ||--o| BOOKINGS : "genera"
-    ADDRESSES ||--o{ BOOKINGS : "ejecutada en"
-    BOOKINGS ||--|| PAYMENTS : "tiene"
-    BOOKINGS ||--o| REVIEWS : "califica"
-    CUSTOMERS ||--o{ REVIEWS : "escribe"
-    WORKERS ||--o{ REVIEWS : "recibe"
-    WORKERS ||--o{ BADGES : "obtiene"
-    COURSES ||--o{ QUIZ_QUESTIONS : "evalúa con"
-    WORKERS ||--o{ COURSE_COMPLETIONS : "completa"
-    COURSES ||--o{ COURSE_COMPLETIONS : "es completado por"
-    BADGES ||--o{ COURSE_COMPLETIONS : "se otorga en"
-    USERS ||--o{ NOTIFICATIONS : "recibe"
-    USERS ||--o{ AUDIT_LOG : "genera"
-
-    USERS {
+    users {
         UUID id PK
         VARCHAR email UK
         VARCHAR password_hash
         VARCHAR phone UK
-        ENUM status
-        ENUM user_type
+        VARCHAR status
+        VARCHAR user_type
         TIMESTAMP created_at
+        TIMESTAMP last_login_at
     }
-    CUSTOMERS {
-        UUID id PK
-        UUID user_id FK
+    customers {
+        UUID id PK_FK
         VARCHAR first_name
         VARCHAR last_name
-        UUID default_district_id FK
     }
-    WORKERS {
-        UUID id PK
-        UUID user_id FK
+    workers {
+        UUID id PK_FK
         VARCHAR first_name
         VARCHAR last_name
         VARCHAR dni UK
@@ -203,141 +203,96 @@ erDiagram
         INT total_services
         BOOLEAN verified
     }
-    IDENTITY_VERIFICATIONS {
+    identity_verifications {
         UUID id PK
         UUID worker_id FK
         VARCHAR dni_front_url
         VARCHAR dni_back_url
         VARCHAR selfie_url
-        ENUM status
+        VARCHAR status
         TIMESTAMP submitted_at
         TIMESTAMP reviewed_at
         TEXT rejection_reason
+        UUID reviewed_by FK
     }
-    SERVICE_CATEGORIES {
+    service_categories {
         UUID id PK
         VARCHAR name UK
         VARCHAR slug UK
+        TEXT description
         VARCHAR icon_key
         BOOLEAN active
     }
-    DISTRICTS {
+    districts {
         UUID id PK
         VARCHAR name
         VARCHAR region
         VARCHAR ubigeo
     }
-    WORKER_OFFERINGS {
+    worker_offerings {
         UUID id PK
         UUID worker_id FK
         UUID category_id FK
         DECIMAL base_price
         INT estimated_hours
+        BOOLEAN active
     }
-    WORKER_COVERAGE {
+    worker_coverage {
         UUID id PK
         UUID worker_id FK
         UUID district_id FK
     }
-    ADDRESSES {
-        UUID id PK
-        UUID customer_id FK
-        VARCHAR street
-        UUID district_id FK
-        DECIMAL lat
-        DECIMAL lng
-    }
-    QUOTES {
+    service_requests {
         UUID id PK
         UUID customer_id FK
         UUID worker_id FK
         UUID category_id FK
+        UUID district_id FK
         TEXT description
-        ENUM urgency
-        ENUM status
-        DECIMAL amount
-        INT estimated_hours
-        TIMESTAMP proposed_date
-        TIMESTAMP created_at
-        TIMESTAMP expires_at
-    }
-    BOOKINGS {
-        UUID id PK
-        UUID quote_id FK
-        UUID address_id FK
+        VARCHAR urgency
+        VARCHAR status
+        DECIMAL agreed_amount
         TIMESTAMP scheduled_at
-        ENUM status
+        VARCHAR confirmation_code
+        TEXT rejection_reason
+        TIMESTAMP created_at
+        TIMESTAMP accepted_at
         TIMESTAMP completed_at
     }
-    PAYMENTS {
+    reviews {
         UUID id PK
-        UUID booking_id FK
-        ENUM method
-        DECIMAL amount
-        DECIMAL commission
-        DECIMAL net_amount
-        ENUM status
-        VARCHAR gateway_tx_id
-        TIMESTAMP released_at
-    }
-    REVIEWS {
-        UUID id PK
-        UUID booking_id FK
+        UUID service_request_id UK_FK
         UUID customer_id FK
         UUID worker_id FK
         INT rating
         TEXT comment
-        VARCHAR photo_url
-        TEXT response
+        TEXT worker_response
+        BOOLEAN flagged
         TIMESTAMP published_at
+        TIMESTAMP responded_at
     }
-    BADGES {
-        UUID id PK
-        UUID worker_id FK
-        ENUM type
-        TIMESTAMP granted_at
-        TIMESTAMP revoked_at
-    }
-    COURSES {
-        UUID id PK
-        VARCHAR title
-        VARCHAR video_url
-        INT duration_min
-        INT required_score
-    }
-    QUIZ_QUESTIONS {
-        UUID id PK
-        UUID course_id FK
-        TEXT text
-        JSONB options
-        INT correct_index
-    }
-    COURSE_COMPLETIONS {
-        UUID id PK
-        UUID worker_id FK
-        UUID course_id FK
-        INT score
-        BOOLEAN passed
-        TIMESTAMP completed_at
-    }
-    NOTIFICATIONS {
-        UUID id PK
-        UUID recipient_id FK
-        ENUM channel
-        VARCHAR title
-        TEXT body
-        TIMESTAMP sent_at
-        TIMESTAMP read_at
-    }
-    AUDIT_LOG {
-        UUID id PK
-        UUID user_id FK
-        VARCHAR action
-        VARCHAR entity_type
-        UUID entity_id
-        JSONB metadata
-        TIMESTAMP created_at
-    }
+
+    users ||--|| customers : "tiene perfil"
+    users ||--|| workers : "tiene perfil"
+    workers ||--o{ identity_verifications : "envía"
+    workers ||--o{ worker_offerings : "ofrece"
+    service_categories ||--o{ worker_offerings : "tipo de"
+    workers ||--o{ worker_coverage : "cubre"
+    districts ||--o{ worker_coverage : "se cubre en"
+    customers ||--o{ service_requests : "crea"
+    workers ||--o{ service_requests : "recibe"
+    service_categories ||--o{ service_requests : "referencia"
+    districts ||--o{ service_requests : "ubica en"
+    service_requests ||--o| reviews : "genera (UNIQUE)"
+    workers ||--o{ reviews : "sobre"
 ```
 
-Para exportar a PNG: pega cualquiera de los bloques `mermaid` en https://mermaid.live y descarga.
+---
+
+## Cómo exportar a PNG
+
+1. Copia el bloque `mermaid` que necesites.
+2. Abre https://mermaid.live
+3. Pega el código.
+4. Click **PNG** o **SVG** en el panel superior derecho.
+5. Inserta la imagen en el Word (secciones 4.7.1 y 4.7.2) con su explicación técnica.

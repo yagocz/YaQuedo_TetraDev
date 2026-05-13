@@ -1,0 +1,68 @@
+<mxfile host="app.diagrams.net" modified="2026-05-12T18:00:00.000Z" agent="TetraDev" version="22.1.0" type="device">
+  <diagram name="C4-Container-YaQuedo" id="c4-container-yaquedo">
+    <mxGraphModel dx="1422" dy="757" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="Diagrama de Contenedores · Ya Quedó (Nivel 2 · C4 Model)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="200" y="30" width="1400" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="cliente" value="Cliente&#xa;[Persona]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontSize=12;align=center" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="trabajador" value="Trabajador&#xa;[Persona]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontSize=12;align=center" vertex="1" parent="1">
+          <mxGeometry x="300" y="120" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="soporte" value="Soporte TetraDev&#xa;[Persona]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#08427B;strokeColor=#073B6F;fontColor=#FFFFFF;fontSize=12;align=center" vertex="1" parent="1">
+          <mxGeometry x="500" y="120" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="boundary" value="Plataforma Ya Quedó · Sistema" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1F2937;dashed=1;fontSize=14;fontStyle=1;verticalAlign=top;align=left;spacingLeft=12;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="60" y="280" width="1080" height="700" as="geometry" />
+        </mxCell>
+        <mxCell id="landing" value="Landing Page&#xa;[Container]&#xa;HTML5 + CSS3 + JS&#xa;&#xa;Sitio público con propuesta de valor, pre-registro, FAQ y páginas legales (US-01 a US-10)." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=11;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="100" y="340" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="webApp" value="Web Application (SPA)&#xa;[Container]&#xa;Angular 17 + TypeScript&#xa;&#xa;App responsive (desktop/mobile) que ejecuta flujos logueados: registro, búsqueda, perfil, calificación." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=11;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="420" y="340" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="Web Services API REST&#xa;[Container]&#xa;Spring Boot 3.2 + Java 21&#xa;&#xa;API RESTful con DDD: 6 Bounded Contexts (IAM, Identity, Catalog, Worker, Booking, Reputation). 24 endpoints cubriendo 11 User Stories. Expone OpenAPI/Swagger." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=11;align=center;verticalAlign=middle;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="740" y="340" width="280" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Base de Datos&#xa;[ContainerDb]&#xa;PostgreSQL 16&#xa;&#xa;10 tablas: users, customers, workers, identity_verifications, service_categories, districts, worker_offerings, worker_coverage, service_requests, reviews." style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=11;align=center" vertex="1" parent="1">
+          <mxGeometry x="100" y="640" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="cache" value="Cache&#xa;[ContainerDb]&#xa;Redis 7&#xa;&#xa;OTPs con TTL 5 min, rate-limiting de login, sesiones JWT, búsquedas frecuentes." style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=11;align=center" vertex="1" parent="1">
+          <mxGeometry x="420" y="640" width="240" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="storage" value="Object Storage&#xa;[Container]&#xa;MinIO (S3-compatible · local)&#xa;&#xa;Almacena fotos de DNI, selfies y fotos de perfil del trabajador." style="rounded=0;whiteSpace=wrap;html=1;fillColor=#438DD5;strokeColor=#3373AC;fontColor=#FFFFFF;fontSize=11;align=center;verticalAlign=middle" vertex="1" parent="1">
+          <mxGeometry x="740" y="640" width="280" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="email" value="Servicio Correo&#xa;[Externo]&#xa;SMTP / SendGrid free" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#6B6B6B;fontColor=#FFFFFF;fontSize=11;align=center" vertex="1" parent="1">
+          <mxGeometry x="1240" y="340" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="osm" value="OpenStreetMap&#xa;[Externo · Gratuito]&#xa;Tiles vía Leaflet.js" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#6B6B6B;fontColor=#FFFFFF;fontSize=11;align=center" vertex="1" parent="1">
+          <mxGeometry x="1240" y="480" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="ga4" value="Google Analytics 4&#xa;[Externo · Gratuito]&#xa;gtag.js" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#999999;strokeColor=#6B6B6B;fontColor=#FFFFFF;fontSize=11;align=center" vertex="1" parent="1">
+          <mxGeometry x="1240" y="620" width="220" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="Visita landing&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="cliente" target="landing"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e2" value="Usa la app&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.4;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="cliente" target="webApp"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e3" value="Conoce beneficios&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.7;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="trabajador" target="landing"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e4" value="Verifica DNI, gestiona perfil&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.6;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="trabajador" target="webApp"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e5" value="Modera, aprueba/rechaza&#xa;verificaciones&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.85;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="soporte" target="webApp"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e6" value="POST /pre-register&#xa;[HTTPS/JSON]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="landing" target="webApp"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e7" value="JWT + JSON&#xa;[HTTPS/REST]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="webApp" target="api"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e8" value="Lee/escribe&#xa;[JDBC]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.3;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="api" target="db"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e9" value="OTP, rate-limit&#xa;[Redis Protocol]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="api" target="cache"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e10" value="Sube/recupera DNI y selfie&#xa;[S3 API]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.7;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="api" target="storage"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e11" value="Envía OTP y notifs&#xa;[SMTP]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="api" target="email"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e12" value="Renderiza mapas&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="webApp" target="osm"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="e13" value="Reporta eventos&#xa;[HTTPS]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;endArrow=block;endFill=1" edge="1" parent="1" source="landing" target="ga4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="legend" value="LEYENDA C4 Nivel 2&#xa;&#xa;◼ Persona / Actor&#xa;◼ Container (componente desplegable)&#xa;◼ ContainerDb (cilindro = datos persistentes)&#xa;◼ Sistema externo&#xa;&#xa;[Tecnología] · [Protocolo]&#xa;&#xa;Línea punteada = límite del sistema" style="text;html=1;align=left;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=11;fillColor=#F3F4F6;strokeColor=#6B7280;spacingLeft=12;spacingTop=10" vertex="1" parent="1">
+          <mxGeometry x="1240" y="780" width="500" height="200" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

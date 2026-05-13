@@ -39,10 +39,16 @@ Te ofrecemos los diagramas en **3 formatos** para que uses el que más te acomod
 ```
 tb2/
 ├── README.md                              ← este archivo
+├── RUBRIC-CHECKLIST.md                    ← checklist final por criterio (qué está hecho, qué falta)
+├── VERSION-LOG.md                         ← registro de versiones para pegar en el Word
 ├── architecture-c4/
-│   ├── 01-context.puml                   ← Nivel 1
-│   ├── 02-container.puml                 ← Nivel 2
-│   ├── 03-component.puml                 ← Nivel 3
+│   ├── 01-context.puml                    ← Nivel 1 (PlantUML)
+│   ├── 02-container.puml                  ← Nivel 2
+│   ← 03-component.puml                    ← Nivel 3
+│   ├── c4-context.drawio                  ← Nivel 1 (diagrams.net) ★ formato pedido por el profesor
+│   ├── c4-container.drawio                ← Nivel 2 (diagrams.net)
+│   ├── c4-component.drawio                ← Nivel 3 (diagrams.net)
+│   ├── README-drawio.md                   ← cómo abrir / exportar .drawio
 │   ├── mermaid-versions.md                ← versiones Mermaid de los 3 niveles
 │   ├── structurizr.dsl                    ← formato oficial C4
 │   ├── lucidchart-prompts.md              ← instrucciones paso a paso
@@ -50,19 +56,27 @@ tb2/
 ├── object-oriented-design/
 │   ├── class-diagram.puml
 │   ├── database-er.puml
-│   ├── mermaid-versions.md
-│   └── lucidchart-prompts.md
+│   └── mermaid-versions.md
 ├── sprint-2/
 │   ├── planning.md                        ← Sprint Planning 2 evidencia
 │   ├── backlog.md                         ← Sprint Backlog 2 con 12 funcionalidades
 │   ├── tasks-decomposition.md             ← descomposición de US a tasks
 │   └── git-flow-tb2.md                    ← convenciones GitFlow para Sprint 2
-└── web-services/
-    ├── api-design.md                      ← 12 endpoints REST priorizados
-    ├── openapi-skeleton.yaml              ← spec OpenAPI/Swagger inicial
-    ├── project-structure.md               ← estructura Spring Boot DDD
-    ├── docker-setup.md                    ← Dockerfile + docker-compose
-    └── postman-collection.json            ← colección para testing manual
+├── web-services/
+│   ├── api-design.md                      ← 12 endpoints REST priorizados
+│   ├── openapi-skeleton.yaml              ← spec OpenAPI/Swagger inicial
+│   ├── project-structure.md               ← estructura Spring Boot DDD
+│   ├── docker-setup.md                    ← Dockerfile + docker-compose
+│   └── postman-collection.json            ← colección importable a Postman
+└── backend/                               ← ★ código real Spring Boot (criterio 5 rúbrica)
+    ├── pom.xml                            ← parent POM multi-módulo
+    ├── shared-kernel/                     ← tipos comunes (Money, ApiResponse, excepciones)
+    ├── iam-context/                       ← 4 endpoints Auth (US-11, US-12)
+    ├── identity-context/                  ← 2 endpoints Verification (US-13)
+    ├── catalog-context/                   ← 1 endpoint Categories (US-15)
+    ├── worker-context/                    ← 5 endpoints Worker profile/search (US-14, US-17)
+    ├── application/                       ← main class, config, Flyway migrations
+    └── docker/                            ← Dockerfile + docker-compose.yml
 ```
 
 ## Mejoras al landing (TB2)
