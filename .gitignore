@@ -1,0 +1,44 @@
+# ============================================================================
+# YaQuedo · .gitignore
+# ============================================================================
+
+# Configuración local de AI (contiene API keys reales — NUNCA commitear)
+ai-config.local.js
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencias de build (no aplican aquí pero por las dudas)
+node_modules/
+
+# Backend (Java/Maven)
+tb2/backend/**/target/
+tb2/backend/**/*.class
+tb2/backend/**/.classpath
+tb2/backend/**/.project
+tb2/backend/**/.settings/
+tb2/backend/.env
+tb2/backend/*.pem
+
+# Docker volumes locales
+postgres_data/
+redis_data/
+minio_data/
+
+# Archivos temporales
+*.tmp
+*.bak
+*~
