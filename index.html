@@ -590,8 +590,69 @@
         </div>
     </footer>
 
+    <!-- ======== CHATBOT IA · Asistente virtual de Ya Quedó ======== -->
+    <button id="yqAiToggle" class="yq-ai-toggle" type="button"
+            aria-label="Abrir asistente virtual Ya Quedó"
+            aria-expanded="false" aria-controls="yqAiPanel">
+        <i class="fa-solid fa-comments" aria-hidden="true"></i>
+        <span class="yq-ai-toggle-label">Asistente IA</span>
+    </button>
+
+    <aside id="yqAiPanel" class="yq-ai-panel" role="dialog" aria-labelledby="yqAiTitle" aria-hidden="true">
+        <header class="yq-ai-header">
+            <div class="yq-ai-header-info">
+                <span class="yq-ai-avatar" aria-hidden="true">YQ</span>
+                <div>
+                    <h2 id="yqAiTitle" class="yq-ai-title">Asistente Ya Quedó</h2>
+                    <span class="yq-ai-status">En línea · IA generativa</span>
+                </div>
+            </div>
+            <button id="yqAiClose" class="yq-ai-close" type="button" aria-label="Cerrar asistente">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+        </header>
+
+        <div id="yqAiMessages" class="yq-ai-messages" aria-live="polite">
+            <div class="yq-ai-msg yq-ai-msg-bot">
+                ¡Hola! Soy <strong>YaQuedo Bot</strong>, tu asistente virtual.
+                Puedo ayudarte a:
+                <ul>
+                    <li>Encontrar el técnico ideal para tu problema</li>
+                    <li>Ver qué trabajadores cubren tu distrito</li>
+                    <li>Conocer precios referenciales por servicio</li>
+                    <li>Entender cómo funciona la plataforma</li>
+                    <li>Resolver dudas sobre registro o seguridad</li>
+                </ul>
+                ¿Qué necesitas hoy?
+            </div>
+        </div>
+
+        <form id="yqAiForm" class="yq-ai-form" autocomplete="off">
+            <label for="yqAiInput" class="sr-only">Escribe tu pregunta</label>
+            <input id="yqAiInput" type="text" placeholder="Escribe tu pregunta…"
+                   maxlength="500" required />
+            <button type="submit" aria-label="Enviar mensaje">
+                <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+            </button>
+        </form>
+
+        <p class="yq-ai-footnote">
+            Potenciado por IA generativa (Llama 3.3 70B vía Groq) · Las respuestas son
+            orientativas. Para contratar, regístrate en Ya Quedó.
+        </p>
+    </aside>
+
     <!-- ======== JAVASCRIPT ======== -->
     <script src="i18n.js"></script>
     <script src="script.js"></script>
+    <!--
+        ai-config.local.js inyecta window.YQ_GROQ_API_KEY.
+        - En local: créalo manualmente (está en .gitignore).
+        - En GitHub Pages: lo genera el workflow .github/workflows/deploy-pages.yml
+          a partir del secret GROQ_API_KEY del repositorio.
+        Si no existe, el navegador muestra un 404 silencioso (no rompe la página).
+    -->
+    <script src="ai-config.local.js"></script>
+    <script src="ai-assistant.js"></script>
 </body>
 </html>
