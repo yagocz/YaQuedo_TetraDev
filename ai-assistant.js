@@ -36,7 +36,9 @@
     //
     // Ver tb2/AI-ASSISTANT-DEPLOY.md para guía completa.
 
-    const GROQ_API_KEY = (typeof window !== 'undefined' && window.YQ_GROQ_API_KEY) || 'YOUR_GROQ_API_KEY_HERE';
+    // Fallback hardcoded para producción (GitHub Pages sin Actions disponibles por billing).
+    // TB2 académico: aceptable. Revocar la key después de la entrega.
+    const GROQ_API_KEY = (typeof window !== 'undefined' && window.YQ_GROQ_API_KEY) || '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';
     const OPENROUTER_API_KEY = (typeof window !== 'undefined' && window.YQ_OPENROUTER_API_KEY) || 'YOUR_OPENROUTER_API_KEY_HERE';
 
     // =========================================================================
