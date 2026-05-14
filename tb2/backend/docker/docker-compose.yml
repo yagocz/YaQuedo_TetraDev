@@ -1,0 +1,76 @@
+name: yaquedo-stack
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yaquedo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: yaquedo
+      POSTGRES_USER: yaquedo
+      POSTGRES_PASSWORD: yaquedo_local_pwd
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yaquedo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: yaquedo-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  minio:
+    image: minio/minio:latest
+    container_name: yaquedo-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: yaquedo-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      minio:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_URL: jdbc:postgresql://postgres:5432/yaquedo
+      DB_USER: yaquedo
+      DB_PASSWORD: yaquedo_local_pwd
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: minioadmin
+      S3_SECRET_KEY: minioadmin
+      S3_BUCKET: yaquedo-uploads
+      JWT_SECRET: please-change-this-secret-please-change-this-secret-please
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
