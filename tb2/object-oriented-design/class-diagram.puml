@@ -1,0 +1,110 @@
+@startuml ClassDiagram-YaQuedo
+
+title Class Diagram — YaQuedo TB2
+
+class YaQuedo {
+    +String nombre
+    +String url
+    +String version
+    --
+    +iniciarPlataforma()
+    +procesarMatching()
+    +gestionarUsuarios()
+}
+
+class Usuario {
+    +UUID id
+    +String email
+    +String password
+    +String rol
+    +Boolean estadoActivo
+    --
+    +iniciarSesion()
+    +cerrarSesion()
+    +recuperarPassword()
+}
+
+class Cliente {
+    +String nombres
+    +String apellidos
+    +String telefono
+    --
+    +buscarTrabajador()
+    +crearSolicitud()
+    +calificarServicio()
+}
+
+class Trabajador {
+    +String nombres
+    +String apellidos
+    +String telefono
+    +String dni
+    +Double calificacionPromedio
+    +Boolean disponibilidad
+    --
+    +aceptarSolicitud()
+    +actualizarUbicacion()
+}
+
+class CategoriaServicio {
+    +UUID id
+    +String nombre
+    +String descripcion
+}
+
+class Ubicacion {
+    +Double latitud
+    +Double longitud
+    +String direccionPlana
+}
+
+class Notificacion {
+    +UUID id
+    +String mensaje
+    +String tipo
+    +Boolean leida
+}
+
+class SolicitudServicio {
+    +UUID id
+    +String estado
+    +DateTime fechaProgramada
+    +String descripcion
+    +Double precioAcordado
+    --
+    +finalizarServicio()
+    +cancelarServicio()
+}
+
+class Pago {
+    +UUID id
+    +Double monto
+    +String metodoPago
+    +String estado
+    --
+    +procesarTransaccion()
+}
+
+class Resena {
+    +UUID id
+    +Integer puntuacion
+    +String comentario
+    +DateTime fecha
+}
+
+YaQuedo "1" -- "*" Usuario : administra
+Usuario <|-- Cliente
+Usuario <|-- Trabajador
+
+Trabajador "*" -- "1" CategoriaServicio : ofrece >
+Trabajador "1" -- "1" Ubicacion : tiene >
+
+Cliente "1" -- "*" SolicitudServicio : crea >
+Trabajador "1" -- "*" SolicitudServicio : atiende >
+SolicitudServicio "1" -- "1" Ubicacion : se realiza en >
+SolicitudServicio "1" -- "0..1" Pago : genera >
+SolicitudServicio "1" -- "0..1" Resena : recibe >
+
+Usuario "1" -- "*" Notificacion : recibe >
+
+@enduml

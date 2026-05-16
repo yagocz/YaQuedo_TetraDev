@@ -1,0 +1,43 @@
+# =============================================================================
+# docker-compose.yml · YaQuedo TB2 (backend + postgres)
+# =============================================================================
+
+services:
+  yaquedo-postgres:
+    image: postgres:16-alpine
+    container_name: yaquedo-postgres
+    environment:
+      POSTGRES_DB: yaquedo
+      POSTGRES_USER: yaquedo
+      POSTGRES_PASSWORD: yaquedo_local_pwd
+    ports:
+      - "5432:5432"
+    volumes:
+      - yaquedo_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yaquedo -d yaquedo"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  yaquedo-backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: yaquedo-backend
+    depends_on:
+      yaquedo-postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://yaquedo-postgres:5432/yaquedo
+      DB_USER: yaquedo
+      DB_PASSWORD: yaquedo_local_pwd
+      JWT_SECRET: yaquedo-tb2-local-secret-please-change-min-32chars
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+    ports:
+      - "8080:8080"
+
+volumes:
+  yaquedo_db:

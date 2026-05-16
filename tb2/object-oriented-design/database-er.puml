@@ -1,0 +1,104 @@
+@startuml DatabaseER-YaQuedo
+
+title Database ER — YaQuedo TB2
+
+entity "USUARIO" as usuario {
+    *id : UUID [PK]
+    --
+    *email : String
+    *password : String
+    *rol : String
+    *estadoActivo : Boolean
+}
+
+entity "CLIENTE" as cliente {
+    *id : UUID [PK]
+    --
+    *usuario_id : UUID [FK]
+    *nombres : String
+    *apellidos : String
+    telefono : String
+}
+
+entity "TRABAJADOR" as trabajador {
+    *id : UUID [PK]
+    --
+    *usuario_id : UUID [FK]
+    *categoria_id : UUID [FK]
+    ubicacion_id : UUID [FK]
+    *nombres : String
+    *apellidos : String
+    telefono : String
+    dni : String
+    *calificacionPromedio : Float
+    *disponibilidad : Boolean
+}
+
+entity "CATEGORIA_SERVICIO" as categoria {
+    *id : UUID [PK]
+    --
+    *nombre : String
+    descripcion : String
+}
+
+entity "UBICACION" as ubicacion {
+    *id : UUID [PK]
+    --
+    *latitud : Float
+    *longitud : Float
+    direccionPlana : String
+}
+
+entity "NOTIFICACION" as notificacion {
+    *id : UUID [PK]
+    --
+    *usuario_id : UUID [FK]
+    *mensaje : String
+    *tipo : String
+    *leida : Boolean
+}
+
+entity "SOLICITUD_SERVICIO" as solicitud {
+    *id : UUID [PK]
+    --
+    *cliente_id : UUID [FK]
+    *trabajador_id : UUID [FK]
+    ubicacion_id : UUID [FK]
+    *estado : String
+    fechaProgramada : DateTime
+    descripcion : String
+    precioAcordado : Float
+}
+
+entity "PAGO" as pago {
+    *id : UUID [PK]
+    --
+    *solicitud_id : UUID [FK]
+    *monto : Float
+    *metodoPago : String
+    *estado : String
+}
+
+entity "RESENA" as resena {
+    *id : UUID [PK]
+    --
+    *solicitud_id : UUID [FK]
+    *puntuacion : Integer
+    comentario : String
+    *fecha : DateTime
+}
+
+usuario ||--|| cliente
+usuario ||--|| trabajador
+usuario ||--o{ notificacion
+
+categoria ||--o{ trabajador
+ubicacion ||--o| trabajador
+ubicacion ||--o| solicitud
+
+cliente ||--o{ solicitud
+trabajador ||--o{ solicitud
+solicitud ||--o| pago
+solicitud ||--o| resena
+
+@enduml
