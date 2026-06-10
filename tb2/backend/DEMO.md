@@ -41,19 +41,48 @@ Abrir en navegador:
 
 **http://localhost:8080/swagger-ui.html**
 
-Se ven los **8 controllers** con los **30 endpoints documentados**:
+Se ven los **9 controllers** con los **32 endpoints documentados**:
 
-| Tag (controller) | Endpoints | User Stories cubiertas |
+| Tag (controller) | Endpoints |
+|---|---|
+| Auth | 2 |
+| Clientes | 4 |
+| Workers | 6 |
+| Requests | 9 |
+| Reviews | 3 |
+| Matching | 1 |
+| Location | 2 |
+| Notifications | 4 |
+| AI Assistant | 1 |
+| **Total** | **32** |
+
+### Trazabilidad User Stories ↔ Endpoints (Sprint Backlog TB2)
+
+Las 11 User Stories del segmento "Cliente que contrata" comprometidas en el Sprint 2 se cubren al 100%:
+
+| US | Titulo | Endpoint(s) clave | Controller |
+|---|---|---|---|
+| US-01 | Registro de usuarios | `POST /api/auth/register` | Auth |
+| US-02 | Inicio de sesion seguro | `POST /api/auth/login` | Auth |
+| US-03 | Busqueda de trabajadores por categoria | `GET /api/workers`, `GET /api/workers/categorias` | Workers |
+| US-04 | Filtros basicos de busqueda | `GET /api/workers?categoriaId=...&minRating=...` | Workers |
+| US-05 | Visualizacion de perfil del trabajador | `GET /api/workers/{id}` | Workers |
+| US-06 | Solicitud de servicio | `POST /api/requests` | Requests |
+| US-07 | Aceptacion de solicitud | `PATCH /api/requests/{id}/aceptar` y `/rechazar` | Requests |
+| US-08 | Agendamiento del servicio | `POST /api/requests` (campo fechaProgramada) | Requests |
+| US-09 | Confirmacion de contratacion finalizada | `PATCH /api/requests/{id}/iniciar` y `/finalizar` | Requests |
+| US-10 | Sistema de calificaciones y resenas | `POST /api/reviews` | Reviews |
+| US-11 | Ver reputacion (rating) | `GET /api/reviews/trabajador/{id}/promedio` y `PATCH /api/workers/{id}/rating` | Reviews + Workers |
+
+**Endpoints transversales (no atados a una US especifica pero exigidos por la arquitectura):**
+
+| Bounded Context | Endpoints | Para que |
 |---|---|---|
-| Auth | 2 | US-01, US-02 |
-| Clientes | 4 | (apoyo perfil cliente) |
-| Workers | 7 | US-03, US-05, US-11 |
-| Requests | 9 | US-06, US-07, US-08, US-09 |
-| Reviews | 3 | US-10, US-11 |
-| Matching | 1 | (apoyo busqueda inteligente) |
-| Location | 2 | (apoyo geocoding) |
-| Notifications | 4 | (apoyo notificaciones) |
-| AI Assistant | 1 | (chat de soporte) |
+| Clientes | 4 | CRUD basico del perfil del cliente (consumido por US-01) |
+| Matching | 1 | Recomendacion inteligente de trabajadores (apoyo US-03/US-04) |
+| Location | 2 | Geocoding + distancia (apoyo busqueda geografica) |
+| Notifications | 4 | Mensajes y correos al cliente/trabajador (apoyo US-07) |
+| AI Assistant | 1 | Chat conversacional con Llama 3.3 via Groq (valor agregado) |
 
 ---
 
