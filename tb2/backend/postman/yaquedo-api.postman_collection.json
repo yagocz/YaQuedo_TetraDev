@@ -1,0 +1,304 @@
+{
+  "info": {
+    "name": "YaQuedo API · TB3",
+    "description": "Coleccion completa para validar los 32 endpoints del backend YaQuedo Spring Boot 3.2 distribuidos en 9 controllers (Auth=2, Clientes=4, Workers=6, Requests=9, Reviews=3, Matching=1, Location=2, Notifications=4, AI=1).\n\n## Como usarla\n1. Levanta el stack: `cd tb2/backend/docker && docker compose up --build`\n2. Importa este JSON en Postman.\n3. Importa tambien `yaquedo-api.postman_environment.json` y selecciona el environment.\n4. Corre la carpeta **0 · Auth** primero para obtener el `jwt_cliente` y `jwt_trabajador` (se guardan automaticamente en las variables).\n5. Luego corre cualquier otra carpeta.\n\n## Usuarios demo (seed V3)\n| Email | Password | Rol |\n|---|---|---|\n| admin@yaquedo.pe | password123 | ADMIN |\n| ana@yaquedo.pe | password123 | CLIENTE |\n| luis@yaquedo.pe | password123 | TRABAJADOR (gasfitero) |\n| maria@yaquedo.pe | password123 | TRABAJADOR (electricista) |\n| carlos@yaquedo.pe | password123 | TRABAJADOR (pintor) |\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080", "type": "string" },
+    { "key": "jwt_cliente", "value": "", "type": "string" },
+    { "key": "jwt_trabajador", "value": "", "type": "string" },
+    { "key": "cliente_id", "value": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "type": "string" },
+    { "key": "trabajador_id", "value": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "type": "string" },
+    { "key": "trabajador_id_maria", "value": "cccccccc-cccc-cccc-cccc-cccccccccccc", "type": "string" },
+    { "key": "solicitud_id", "value": "ffffffff-ffff-ffff-ffff-ffffffffffff", "type": "string" },
+    { "key": "solicitud_finalizada_id", "value": "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "0 · Auth",
+      "item": [
+        {
+          "name": "POST /api/auth/register · nuevo cliente",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":["pm.test('Status 201', () => pm.response.to.have.status(201));"]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/auth/register",
+            "body": { "mode":"raw","raw": "{\n  \"email\": \"nuevo@yaquedo.pe\",\n  \"password\": \"password123\",\n  \"rol\": \"CLIENTE\"\n}" }
+          }
+        },
+        {
+          "name": "POST /api/auth/login · cliente Ana (guarda JWT)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const json = pm.response.json();",
+            "if (json.token) { pm.collectionVariables.set('jwt_cliente', json.token); }",
+            "if (json.accessToken) { pm.collectionVariables.set('jwt_cliente', json.accessToken); }"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/auth/login",
+            "body": { "mode":"raw","raw": "{\n  \"email\": \"ana@yaquedo.pe\",\n  \"password\": \"password123\"\n}" }
+          }
+        },
+        {
+          "name": "POST /api/auth/login · trabajador Luis (guarda JWT)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "pm.test('Status 200', () => pm.response.to.have.status(200));",
+            "const json = pm.response.json();",
+            "if (json.token) { pm.collectionVariables.set('jwt_trabajador', json.token); }",
+            "if (json.accessToken) { pm.collectionVariables.set('jwt_trabajador', json.accessToken); }"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/auth/login",
+            "body": { "mode":"raw","raw": "{\n  \"email\": \"luis@yaquedo.pe\",\n  \"password\": \"password123\"\n}" }
+          }
+        },
+        {
+          "name": "POST /api/auth/login · credenciales invalidas (esperado 401)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":["pm.test('Status 401', () => pm.response.to.have.status(401));"]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/auth/login",
+            "body": { "mode":"raw","raw": "{\n  \"email\": \"ana@yaquedo.pe\",\n  \"password\": \"clave-mala\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1 · Workers (US-03, US-05, US-11)",
+      "item": [
+        {
+          "name": "GET /api/workers/categorias · listar 6 categorias",
+          "request": { "method":"GET", "url":"{{base_url}}/api/workers/categorias" }
+        },
+        {
+          "name": "GET /api/workers · listar trabajadores (paginado)",
+          "request": { "method":"GET", "url":"{{base_url}}/api/workers?page=0&size=10" }
+        },
+        {
+          "name": "GET /api/workers · filtrar por minRating",
+          "request": { "method":"GET", "url":"{{base_url}}/api/workers?minRating=4.5" }
+        },
+        {
+          "name": "GET /api/workers/{id} · perfil de Luis",
+          "request": { "method":"GET", "url":"{{base_url}}/api/workers/{{trabajador_id}}" }
+        },
+        {
+          "name": "POST /api/workers · crear nuevo trabajador",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/workers",
+            "body": { "mode":"raw","raw": "{\n  \"usuarioId\": \"33333333-3333-3333-3333-333333333333\",\n  \"categoriaId\": null,\n  \"nombres\": \"Luis\",\n  \"apellidos\": \"Quispe\",\n  \"telefono\": \"912345678\",\n  \"dni\": \"47896523\"\n}" }
+          }
+        },
+        {
+          "name": "PATCH /api/workers/{id}/disponibilidad · toggle",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/workers/{{trabajador_id}}/disponibilidad",
+            "body": { "mode":"raw","raw":"{\"disponible\": false}" }
+          }
+        },
+        {
+          "name": "PATCH /api/workers/{id}/rating · actualizar rating",
+          "request": {
+            "method": "PATCH",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/workers/{{trabajador_id}}/rating",
+            "body": { "mode":"raw","raw":"{\"calificacionPromedio\": 4.9}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2 · Clientes",
+      "item": [
+        {
+          "name": "GET /api/clientes · listar todos",
+          "request": { "method":"GET", "url":"{{base_url}}/api/clientes" }
+        },
+        {
+          "name": "GET /api/clientes/{id} · perfil Ana",
+          "request": { "method":"GET", "url":"{{base_url}}/api/clientes/{{cliente_id}}" }
+        },
+        {
+          "name": "GET /api/clientes/usuario/{usuarioId} · por user",
+          "request": { "method":"GET", "url":"{{base_url}}/api/clientes/usuario/22222222-2222-2222-2222-222222222222" }
+        },
+        {
+          "name": "POST /api/clientes · crear nuevo cliente",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/clientes",
+            "body": { "mode":"raw","raw": "{\n  \"usuarioId\": \"22222222-2222-2222-2222-222222222222\",\n  \"nombres\": \"Ana\",\n  \"apellidos\": \"Torres\",\n  \"telefono\": \"987654321\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3 · Requests (US-06, US-07, US-08, US-09)",
+      "item": [
+        {
+          "name": "POST /api/requests · crear solicitud (Ana -> Maria)",
+          "event": [{"listen":"test","script":{"type":"text/javascript","exec":[
+            "if (pm.response.code === 201) {",
+            "  const j = pm.response.json();",
+            "  if (j.id) pm.collectionVariables.set('solicitud_id', j.id);",
+            "}"
+          ]}}],
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/requests",
+            "body": { "mode":"raw","raw": "{\n  \"clienteId\": \"{{cliente_id}}\",\n  \"trabajadorId\": \"{{trabajador_id_maria}}\",\n  \"descripcion\": \"Cambio de tomacorrientes en la sala\",\n  \"precioAcordado\": 85.00\n}" }
+          }
+        },
+        {
+          "name": "GET /api/requests/{id} · obtener solicitud",
+          "request": { "method":"GET", "url":"{{base_url}}/api/requests/{{solicitud_id}}" }
+        },
+        {
+          "name": "GET /api/requests/cliente/{clienteId} · solicitudes de Ana",
+          "request": { "method":"GET", "url":"{{base_url}}/api/requests/cliente/{{cliente_id}}" }
+        },
+        {
+          "name": "GET /api/requests/trabajador/{trabajadorId} · solicitudes recibidas",
+          "request": { "method":"GET", "url":"{{base_url}}/api/requests/trabajador/{{trabajador_id}}" }
+        },
+        {
+          "name": "PATCH /api/requests/{id}/aceptar",
+          "request": { "method":"PATCH", "url":"{{base_url}}/api/requests/{{solicitud_id}}/aceptar" }
+        },
+        {
+          "name": "PATCH /api/requests/{id}/iniciar",
+          "request": { "method":"PATCH", "url":"{{base_url}}/api/requests/{{solicitud_id}}/iniciar" }
+        },
+        {
+          "name": "PATCH /api/requests/{id}/finalizar",
+          "request": { "method":"PATCH", "url":"{{base_url}}/api/requests/{{solicitud_id}}/finalizar" }
+        },
+        {
+          "name": "PATCH /api/requests/{id}/rechazar (esperado 4xx si ya esta finalizada)",
+          "request": { "method":"PATCH", "url":"{{base_url}}/api/requests/{{solicitud_id}}/rechazar" }
+        },
+        {
+          "name": "PATCH /api/requests/{id}/cancelar",
+          "request": { "method":"PATCH", "url":"{{base_url}}/api/requests/{{solicitud_id}}/cancelar" }
+        }
+      ]
+    },
+    {
+      "name": "4 · Reviews (US-10, US-11)",
+      "item": [
+        {
+          "name": "POST /api/reviews · resenar servicio finalizado",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/reviews",
+            "body": { "mode":"raw","raw": "{\n  \"solicitudId\": \"{{solicitud_finalizada_id}}\",\n  \"puntuacion\": 5,\n  \"comentario\": \"Excelente, super recomendado\"\n}" }
+          }
+        },
+        {
+          "name": "GET /api/reviews/trabajador/{trabajadorId} · resenas de Luis",
+          "request": { "method":"GET", "url":"{{base_url}}/api/reviews/trabajador/{{trabajador_id}}" }
+        },
+        {
+          "name": "GET /api/reviews/trabajador/{trabajadorId}/promedio · rating promedio",
+          "request": { "method":"GET", "url":"{{base_url}}/api/reviews/trabajador/{{trabajador_id}}/promedio" }
+        }
+      ]
+    },
+    {
+      "name": "5 · Matching",
+      "item": [
+        {
+          "name": "POST /api/matching/recomendar · top N trabajadores",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/matching/recomendar",
+            "body": { "mode":"raw","raw": "{\n  \"categoria\": \"Gasfiteria\",\n  \"latitud\": -12.0464,\n  \"longitud\": -77.0428,\n  \"topN\": 5\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6 · Location",
+      "item": [
+        {
+          "name": "POST /api/location/geocode · direccion -> lat/lng",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/location/geocode",
+            "body": { "mode":"raw","raw": "{\n  \"direccion\": \"Av. Universitaria 1801, San Miguel, Lima\"\n}" }
+          }
+        },
+        {
+          "name": "POST /api/location/distance · entre dos puntos",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/location/distance",
+            "body": { "mode":"raw","raw": "{\n  \"origenLat\": -12.0464, \"origenLng\": -77.0428,\n  \"destinoLat\": -12.0500, \"destinoLng\": -77.0500\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7 · Notifications",
+      "item": [
+        {
+          "name": "POST /api/notifications · crear notificacion",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/notifications",
+            "body": { "mode":"raw","raw": "{\n  \"usuarioId\": \"22222222-2222-2222-2222-222222222222\",\n  \"mensaje\": \"Tu solicitud fue aceptada\",\n  \"tipo\": \"INFO\"\n}" }
+          }
+        },
+        {
+          "name": "GET /api/notifications/usuario/{usuarioId} · listar de Ana",
+          "request": { "method":"GET", "url":"{{base_url}}/api/notifications/usuario/22222222-2222-2222-2222-222222222222" }
+        },
+        {
+          "name": "PATCH /api/notifications/{id}/leida · marcar como leida",
+          "request": { "method":"PATCH", "url":"{{base_url}}/api/notifications/{notificacion_id_a_reemplazar}/leida" }
+        },
+        {
+          "name": "POST /api/notifications/email · enviar correo",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/notifications/email",
+            "body": { "mode":"raw","raw": "{\n  \"to\": \"ana@yaquedo.pe\",\n  \"subject\": \"Bienvenida a YaQuedo\",\n  \"body\": \"Hola Ana, tu cuenta esta lista.\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8 · AI Assistant",
+      "item": [
+        {
+          "name": "POST /api/ai/chat · pregunta al asistente",
+          "request": {
+            "method": "POST",
+            "header": [{"key":"Content-Type","value":"application/json"}],
+            "url": "{{base_url}}/api/ai/chat",
+            "body": { "mode":"raw","raw": "{\n  \"mensaje\": \"Necesito un gasfitero urgente en San Miguel, hay una fuga grande\"\n}" }
+          }
+        }
+      ]
+    }
+  ]
+}
