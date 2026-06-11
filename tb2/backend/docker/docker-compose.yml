@@ -38,6 +38,7 @@ services:
     image: dpage/pgadmin4:8
     container_name: yaquedo-pgadmin
     restart: unless-stopped
+    user: root
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@yaquedo.pe
       PGADMIN_DEFAULT_PASSWORD: admin
@@ -48,6 +49,14 @@ services:
     volumes:
       - yaquedo_pgadmin:/var/lib/pgadmin
       - ./pgadmin-servers.json:/pgadmin4/servers.json:ro
+      - ./pgpass:/pgpass:ro
+    entrypoint: >
+      /bin/sh -c "
+      cp /pgpass /tmp/pgpass &&
+      chmod 600 /tmp/pgpass &&
+      chown pgadmin:root /tmp/pgpass &&
+      /entrypoint.sh
+      "
     depends_on:
       yaquedo-postgres:
         condition: service_healthy

@@ -7,7 +7,7 @@
             "Port": 5432,
             "MaintenanceDB": "yaquedo",
             "Username": "yaquedo",
-            "PassFile": "/pgpass",
+            "PassFile": "/tmp/pgpass",
             "SSLMode": "prefer"
         }
     }
