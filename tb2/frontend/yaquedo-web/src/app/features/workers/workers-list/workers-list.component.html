@@ -54,20 +54,18 @@
             <div mat-card-avatar class="avatar">
               <mat-icon>engineering</mat-icon>
             </div>
-            <mat-card-title>{{ t.nombre }} {{ t.apellido }}</mat-card-title>
-            <mat-card-subtitle>{{ t.categoriaNombre }} · {{ t.zonaCobertura }}</mat-card-subtitle>
+            <mat-card-title>{{ t.nombres }} {{ t.apellidos }}</mat-card-title>
+            <mat-card-subtitle>{{ categoriaNombre(t.categoriaId) }} · DNI {{ t.dni }}</mat-card-subtitle>
           </mat-card-header>
 
           <mat-card-content>
-            <p class="desc">{{ t.descripcion }}</p>
             <mat-chip-set>
               <mat-chip color="primary" highlighted>
                 <mat-icon matChipAvatar>star</mat-icon>
-                {{ t.rating | number:'1.1-1' }} ({{ t.totalResenas }})
+                {{ t.calificacionPromedio | number:'1.1-1' }}
               </mat-chip>
-              <mat-chip>{{ t.experienciaAnios }} anios exp.</mat-chip>
-              <mat-chip>S/ {{ t.tarifaHora }}/h</mat-chip>
-              @if (t.disponible) {
+              <mat-chip>{{ t.telefono }}</mat-chip>
+              @if (t.disponibilidad) {
                 <mat-chip color="accent" highlighted>Disponible</mat-chip>
               } @else {
                 <mat-chip>Ocupado</mat-chip>

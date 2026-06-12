@@ -76,4 +76,8 @@ export class WorkersListComponent implements OnInit {
   clearFilters(): void {
     this.filters.reset({ categoriaId: '', minRating: 0, soloDisponibles: false, zona: '' });
   }
+
+  categoriaNombre(id: string): string {
+    return this.categorias().find(c => c.id === id)?.nombre ?? 'Servicio';
+  }
 }

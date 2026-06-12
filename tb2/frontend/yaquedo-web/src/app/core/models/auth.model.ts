@@ -3,10 +3,7 @@ export type UserRole = 'CLIENTE' | 'TRABAJADOR' | 'ADMIN';
 export interface RegisterRequest {
   email: string;
   password: string;
-  nombre: string;
-  apellido: string;
-  telefono: string;
-  rol: UserRole;
+  role: UserRole;
 }
 
 export interface LoginRequest {
@@ -17,13 +14,15 @@ export interface LoginRequest {
 export interface UserResponse {
   id: string;
   email: string;
-  nombre: string;
-  apellido: string;
-  telefono: string;
-  rol: UserRole;
+  role: UserRole;
+  estadoActivo: boolean;
+  emailVerificado: boolean;
+  createdAt: string;
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;
+  tokenType: string;
+  expiresInMs: number;
   user: UserResponse;
 }

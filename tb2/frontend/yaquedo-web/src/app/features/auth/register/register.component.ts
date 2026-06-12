@@ -40,12 +40,9 @@ export class RegisterComponent {
   loading = signal(false);
 
   form = this.fb.nonNullable.group({
-    nombre: ['', Validators.required],
-    apellido: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    telefono: ['', [Validators.required, Validators.pattern(/^9\d{8}$/)]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-    rol: ['CLIENTE' as 'CLIENTE' | 'TRABAJADOR', Validators.required]
+    password: ['', [Validators.required, Validators.minLength(8)]],
+    role: ['CLIENTE' as 'CLIENTE' | 'TRABAJADOR', Validators.required]
   });
 
   submit(): void {

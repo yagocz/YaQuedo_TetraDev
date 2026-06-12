@@ -2,24 +2,27 @@ export interface CategoriaServicio {
   id: string;
   nombre: string;
   descripcion?: string;
-  icono?: string;
 }
 
 export interface TrabajadorResponse {
   id: string;
   usuarioId: string;
-  nombre: string;
-  apellido: string;
-  telefono: string;
   categoriaId: string;
-  categoriaNombre: string;
-  descripcion: string;
-  experienciaAnios: number;
-  tarifaHora: number;
-  rating: number;
-  totalResenas: number;
-  disponible: boolean;
-  zonaCobertura: string;
+  ubicacionId: string | null;
+  nombres: string;
+  apellidos: string;
+  telefono: string;
+  dni: string;
+  calificacionPromedio: number;
+  disponibilidad: boolean;
+}
+
+export interface Page<T> {
+  content: T[];
+  totalElements?: number;
+  totalPages?: number;
+  number?: number;
+  size?: number;
 }
 
 export interface TrabajadorSearchFilters {

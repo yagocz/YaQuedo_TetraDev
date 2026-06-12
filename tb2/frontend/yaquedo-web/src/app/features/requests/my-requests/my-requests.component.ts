@@ -50,7 +50,7 @@ export class MyRequestsComponent implements OnInit {
     const user = this.auth.currentUser();
     if (!user) return;
     this.loading.set(true);
-    const obs = user.rol === 'TRABAJADOR'
+    const obs = user.role === 'TRABAJADOR'
       ? this.solicitudes.listPorTrabajador(user.id)
       : this.solicitudes.listPorCliente(user.id);
     obs.subscribe({

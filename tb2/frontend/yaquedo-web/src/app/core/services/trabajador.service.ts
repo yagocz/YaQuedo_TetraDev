@@ -1,11 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
   CategoriaServicio,
   CreateTrabajadorRequest,
+  Page,
   TrabajadorResponse,
   TrabajadorSearchFilters
 } from '../models/trabajador.model';
@@ -13,15 +14,17 @@ import {
 @Injectable({ providedIn: 'root' })
 export class TrabajadorService {
   private readonly http = inject(HttpClient);
-  private readonly base = `${environment.apiBaseUrl}/api/trabajadores`;
+  private readonly base = `${environment.apiBaseUrl}/api/workers`;
 
   search(filters: TrabajadorSearchFilters = {}): Observable<TrabajadorResponse[]> {
     let params = new HttpParams();
     if (filters.categoriaId) params = params.set('categoriaId', filters.categoriaId);
-    if (filters.minRating != null) params = params.set('minRating', filters.minRating);
+    if (filters.minRating != null && filters.minRating > 0) params = params.set('minRating', filters.minRating);
     if (filters.soloDisponibles) params = params.set('soloDisponibles', 'true');
     if (filters.zona) params = params.set('zona', filters.zona);
-    return this.http.get<TrabajadorResponse[]>(`${this.base}/buscar`, { params });
+    return this.http.get<Page<TrabajadorResponse>>(this.base, { params }).pipe(
+      map(page => page?.content ?? [])
+    );
   }
 
   findById(id: string): Observable<TrabajadorResponse> {

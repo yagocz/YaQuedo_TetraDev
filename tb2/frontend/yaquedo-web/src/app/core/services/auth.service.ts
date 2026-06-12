@@ -17,8 +17,8 @@ export class AuthService {
 
   readonly currentUser = this.userSignal.asReadonly();
   readonly isAuthenticated = computed(() => this.userSignal() !== null);
-  readonly isCliente = computed(() => this.userSignal()?.rol === 'CLIENTE');
-  readonly isTrabajador = computed(() => this.userSignal()?.rol === 'TRABAJADOR');
+  readonly isCliente = computed(() => this.userSignal()?.role === 'CLIENTE');
+  readonly isTrabajador = computed(() => this.userSignal()?.role === 'TRABAJADOR');
 
   login(body: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.base}/login`, body).pipe(
@@ -41,7 +41,7 @@ export class AuthService {
   }
 
   private persistSession(res: AuthResponse): void {
-    localStorage.setItem(TOKEN_KEY, res.token);
+    localStorage.setItem(TOKEN_KEY, res.accessToken);
     localStorage.setItem(USER_KEY, JSON.stringify(res.user));
     this.userSignal.set(res.user);
   }

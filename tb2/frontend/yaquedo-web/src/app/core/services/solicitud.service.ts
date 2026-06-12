@@ -13,8 +13,8 @@ import {
 @Injectable({ providedIn: 'root' })
 export class SolicitudService {
   private readonly http = inject(HttpClient);
-  private readonly base = `${environment.apiBaseUrl}/api/solicitudes`;
-  private readonly resenaBase = `${environment.apiBaseUrl}/api/resenas`;
+  private readonly base = `${environment.apiBaseUrl}/api/requests`;
+  private readonly resenaBase = `${environment.apiBaseUrl}/api/reviews`;
 
   create(body: CreateSolicitudRequest): Observable<SolicitudResponse> {
     return this.http.post<SolicitudResponse>(this.base, body);

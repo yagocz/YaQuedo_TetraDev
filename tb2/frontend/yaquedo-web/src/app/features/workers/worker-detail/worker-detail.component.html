@@ -3,51 +3,48 @@
     <div class="text-center mt-3">
       <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
     </div>
-  } @else if (trabajador(); as t) {
-    <mat-card class="detail-card">
-      <mat-card-header>
-        <div mat-card-avatar class="big-avatar">
-          <mat-icon>engineering</mat-icon>
-        </div>
-        <mat-card-title>{{ t.nombre }} {{ t.apellido }}</mat-card-title>
-        <mat-card-subtitle>{{ t.categoriaNombre }}</mat-card-subtitle>
-      </mat-card-header>
+  } @else {
+    @if (trabajador(); as t) {
+      <mat-card class="detail-card">
+        <mat-card-header>
+          <div mat-card-avatar class="big-avatar">
+            <mat-icon>engineering</mat-icon>
+          </div>
+          <mat-card-title>{{ t.nombres }} {{ t.apellidos }}</mat-card-title>
+          <mat-card-subtitle>DNI {{ t.dni }}</mat-card-subtitle>
+        </mat-card-header>
 
-      <mat-card-content>
-        <mat-chip-set>
-          <mat-chip color="primary" highlighted>
-            <mat-icon matChipAvatar>star</mat-icon>
-            {{ t.rating | number:'1.1-1' }} de 5
-          </mat-chip>
-          <mat-chip>{{ t.totalResenas }} resenas</mat-chip>
-          @if (t.disponible) {
-            <mat-chip color="accent" highlighted>Disponible ahora</mat-chip>
-          } @else {
-            <mat-chip>Ocupado</mat-chip>
-          }
-        </mat-chip-set>
+        <mat-card-content>
+          <mat-chip-set>
+            <mat-chip color="primary" highlighted>
+              <mat-icon matChipAvatar>star</mat-icon>
+              {{ t.calificacionPromedio | number:'1.1-1' }} de 5
+            </mat-chip>
+            @if (t.disponibilidad) {
+              <mat-chip color="accent" highlighted>Disponible ahora</mat-chip>
+            } @else {
+              <mat-chip>Ocupado</mat-chip>
+            }
+          </mat-chip-set>
 
-        <mat-divider class="mt-3 mb-2"></mat-divider>
+          <mat-divider class="mt-3 mb-2"></mat-divider>
 
-        <div class="info-grid">
-          <div><strong>Experiencia:</strong> {{ t.experienciaAnios }} anios</div>
-          <div><strong>Tarifa:</strong> S/ {{ t.tarifaHora }} por hora</div>
-          <div><strong>Zona:</strong> {{ t.zonaCobertura }}</div>
-          <div><strong>Telefono:</strong> {{ t.telefono }}</div>
-        </div>
+          <div class="info-grid">
+            <div><strong>Telefono:</strong> {{ t.telefono }}</div>
+            <div><strong>ID Categoria:</strong> {{ t.categoriaId }}</div>
+            <div><strong>ID Usuario:</strong> {{ t.usuarioId }}</div>
+          </div>
+        </mat-card-content>
 
-        <h3 class="mt-3">Sobre el trabajador</h3>
-        <p>{{ t.descripcion }}</p>
-      </mat-card-content>
-
-      <mat-card-actions align="end">
-        <a mat-button routerLink="/trabajadores">Volver</a>
-        <a mat-raised-button color="primary"
-           [routerLink]="['/solicitudes/nueva']"
-           [queryParams]="{ trabajadorId: t.id, categoriaId: t.categoriaId }">
-          <mat-icon>send</mat-icon> Solicitar servicio
-        </a>
-      </mat-card-actions>
-    </mat-card>
+        <mat-card-actions align="end">
+          <a mat-button routerLink="/trabajadores">Volver</a>
+          <a mat-raised-button color="primary"
+             [routerLink]="['/solicitudes/nueva']"
+             [queryParams]="{ trabajadorId: t.id, categoriaId: t.categoriaId }">
+            <mat-icon>send</mat-icon> Solicitar servicio
+          </a>
+        </mat-card-actions>
+      </mat-card>
+    }
   }
 </div>
