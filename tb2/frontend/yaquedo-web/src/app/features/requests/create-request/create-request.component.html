@@ -1,0 +1,97 @@
+<div class="container">
+  <h1 class="page-title">Nueva solicitud de servicio</h1>
+
+  <mat-card class="stepper-card">
+    <mat-stepper linear #stepper>
+      <mat-step [stepControl]="paso1" label="Trabajador" state="person">
+        <form [formGroup]="paso1" class="step-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>ID del trabajador</mat-label>
+            <input matInput formControlName="trabajadorId" readonly>
+            <mat-icon matSuffix>badge</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Categoria del servicio</mat-label>
+            <mat-select formControlName="categoriaId">
+              @for (cat of categorias(); track cat.id) {
+                <mat-option [value]="cat.id">{{ cat.nombre }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <div class="step-actions">
+            <button mat-button matStepperNext color="primary" [disabled]="paso1.invalid">Siguiente</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step [stepControl]="paso2" label="Detalles" state="description">
+        <form [formGroup]="paso2" class="step-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Descripcion del trabajo</mat-label>
+            <textarea matInput rows="4" formControlName="descripcion" placeholder="Ej: necesito reparar fuga en bano principal..."></textarea>
+            @if (paso2.controls.descripcion.touched && paso2.controls.descripcion.invalid) {
+              <mat-error>Describe el trabajo (minimo 15 caracteres)</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha del servicio</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="fechaServicio">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Direccion exacta</mat-label>
+            <input matInput formControlName="direccion" placeholder="Av. Larco 123, Miraflores">
+            <mat-icon matSuffix>place</mat-icon>
+          </mat-form-field>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Atras</button>
+            <button mat-button matStepperNext color="primary" [disabled]="paso2.invalid">Siguiente</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step [stepControl]="paso3" label="Precio" state="payments">
+        <form [formGroup]="paso3" class="step-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Precio ofrecido (S/)</mat-label>
+            <input matInput type="number" formControlName="precioOfrecido" min="10">
+            <mat-icon matSuffix>attach_money</mat-icon>
+            @if (paso3.controls.precioOfrecido.touched && paso3.controls.precioOfrecido.invalid) {
+              <mat-error>Minimo S/ 10</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="step-actions">
+            <button mat-button matStepperPrevious>Atras</button>
+            <button mat-button matStepperNext color="primary">Revisar</button>
+          </div>
+        </form>
+      </mat-step>
+
+      <mat-step label="Confirmar" state="done">
+        <div class="summary">
+          <h3>Resumen de la solicitud</h3>
+          <p><strong>Trabajador:</strong> {{ paso1.controls.trabajadorId.value }}</p>
+          <p><strong>Descripcion:</strong> {{ paso2.controls.descripcion.value }}</p>
+          <p><strong>Fecha:</strong> {{ paso2.controls.fechaServicio.value | date:'mediumDate' }}</p>
+          <p><strong>Direccion:</strong> {{ paso2.controls.direccion.value }}</p>
+          <p><strong>Precio ofrecido:</strong> S/ {{ paso3.controls.precioOfrecido.value }}</p>
+
+          <div class="step-actions mt-3">
+            <button mat-button matStepperPrevious>Atras</button>
+            <button mat-raised-button color="primary" (click)="confirmar()" [disabled]="saving()">
+              <mat-icon>send</mat-icon>
+              {{ saving() ? 'Enviando...' : 'Enviar solicitud' }}
+            </button>
+          </div>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </mat-card>
+</div>

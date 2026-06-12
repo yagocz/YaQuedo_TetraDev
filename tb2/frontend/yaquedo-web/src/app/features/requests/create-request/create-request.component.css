@@ -1,0 +1,5 @@
+.stepper-card { padding: 16px; }
+.step-form { display: flex; flex-direction: column; gap: 8px; padding: 16px 8px; }
+.step-actions { display: flex; gap: 12px; justify-content: flex-end; }
+.summary { padding: 16px; }
+.summary p { margin: 4px 0; }

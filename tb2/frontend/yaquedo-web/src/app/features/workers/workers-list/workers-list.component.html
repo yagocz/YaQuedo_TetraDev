@@ -1,0 +1,88 @@
+<div class="container">
+  <h1 class="page-title">Trabajadores disponibles</h1>
+
+  <mat-card class="filters-card">
+    <form [formGroup]="filters" class="filters-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="categoriaId">
+          <mat-option value="">Todas</mat-option>
+          @for (cat of categorias(); track cat.id) {
+            <mat-option [value]="cat.id">{{ cat.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Zona / distrito</mat-label>
+        <input matInput formControlName="zona" placeholder="Ej: San Isidro">
+        <mat-icon matSuffix>place</mat-icon>
+      </mat-form-field>
+
+      <div class="slider-block">
+        <span class="slider-label">Rating minimo: {{ filters.controls.minRating.value }}</span>
+        <mat-slider min="0" max="5" step="1" discrete>
+          <input matSliderThumb formControlName="minRating">
+        </mat-slider>
+      </div>
+
+      <mat-slide-toggle formControlName="soloDisponibles" color="primary">
+        Solo disponibles ahora
+      </mat-slide-toggle>
+
+      <button mat-button (click)="clearFilters()" type="button">
+        <mat-icon>filter_alt_off</mat-icon> Limpiar
+      </button>
+    </form>
+  </mat-card>
+
+  @if (loading()) {
+    <div class="text-center mt-3">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    </div>
+  } @else if (resultados().length === 0) {
+    <div class="empty-state">
+      <mat-icon style="font-size:48px;width:48px;height:48px;">search_off</mat-icon>
+      <h3>No encontramos trabajadores con esos filtros</h3>
+      <p>Ajusta los criterios o limpia los filtros para ver mas opciones.</p>
+    </div>
+  } @else {
+    <div class="grid">
+      @for (t of resultados(); track t.id) {
+        <mat-card class="worker-card">
+          <mat-card-header>
+            <div mat-card-avatar class="avatar">
+              <mat-icon>engineering</mat-icon>
+            </div>
+            <mat-card-title>{{ t.nombres }} {{ t.apellidos }}</mat-card-title>
+            <mat-card-subtitle>{{ categoriaNombre(t.categoriaId) }} · DNI {{ t.dni }}</mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <mat-chip-set>
+              <mat-chip color="primary" highlighted>
+                <mat-icon matChipAvatar>star</mat-icon>
+                {{ t.calificacionPromedio | number:'1.1-1' }}
+              </mat-chip>
+              <mat-chip>{{ t.telefono }}</mat-chip>
+              @if (t.disponibilidad) {
+                <mat-chip color="accent" highlighted>Disponible</mat-chip>
+              } @else {
+                <mat-chip>Ocupado</mat-chip>
+              }
+            </mat-chip-set>
+          </mat-card-content>
+
+          <mat-card-actions align="end">
+            <a mat-button color="primary" [routerLink]="['/trabajadores', t.id]">
+              Ver perfil
+            </a>
+            <a mat-raised-button color="primary" [routerLink]="['/solicitudes/nueva']" [queryParams]="{ trabajadorId: t.id, categoriaId: t.categoriaId }">
+              <mat-icon>send</mat-icon> Solicitar
+            </a>
+          </mat-card-actions>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

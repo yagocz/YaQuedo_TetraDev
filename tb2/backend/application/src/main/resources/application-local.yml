@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/yaquedo}
+    username: ${DB_USER:yaquedo}
+    password: ${DB_PASSWORD:yaquedo_local_pwd}
+    driver-class-name: org.postgresql.Driver

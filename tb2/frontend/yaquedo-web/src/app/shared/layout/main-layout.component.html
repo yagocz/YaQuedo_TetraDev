@@ -1,0 +1,69 @@
+<mat-sidenav-container class="layout">
+  <mat-sidenav #sidenav mode="side" opened class="sidebar">
+    <div class="brand">
+      <mat-icon color="primary">handyman</mat-icon>
+      <span>Ya Quedo</span>
+    </div>
+
+    <mat-nav-list>
+      <a mat-list-item routerLink="/trabajadores" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>engineering</mat-icon>
+        <span matListItemTitle>Trabajadores</span>
+      </a>
+      <a mat-list-item routerLink="/solicitudes" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>assignment</mat-icon>
+        <span matListItemTitle>Mis solicitudes</span>
+      </a>
+      <a mat-list-item routerLink="/perfil" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>person</mat-icon>
+        <span matListItemTitle>Mi perfil</span>
+      </a>
+      @if (auth.isCliente()) {
+        <a mat-list-item routerLink="/trabajadores" routerLinkActive="active-link">
+          <mat-icon matListItemIcon>add_circle</mat-icon>
+          <span matListItemTitle>Nueva solicitud</span>
+        </a>
+      }
+    </mat-nav-list>
+
+    <div class="sidebar-footer">
+      <mat-icon>info</mat-icon>
+      <span>TetraDev · 1ACC0236</span>
+    </div>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="toolbar">
+      <button mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="title">Ya Quedo</span>
+      <span class="spacer"></span>
+
+      <button mat-button [matMenuTriggerFor]="userMenu">
+        <mat-icon>account_circle</mat-icon>
+        <span class="user-label">{{ auth.currentUser()?.email }}</span>
+        <mat-icon>arrow_drop_down</mat-icon>
+      </button>
+      <mat-menu #userMenu="matMenu">
+        <div mat-menu-item disabled>
+          <mat-icon>badge</mat-icon>
+          <span>{{ auth.currentUser()?.role }}</span>
+        </div>
+        <div mat-menu-item disabled>
+          <mat-icon>email</mat-icon>
+          <span>{{ auth.currentUser()?.email }}</span>
+        </div>
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          <span>Cerrar sesion</span>
+        </button>
+      </mat-menu>
+    </mat-toolbar>
+
+    <main class="content">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

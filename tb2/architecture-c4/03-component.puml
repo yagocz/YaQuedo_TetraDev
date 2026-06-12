@@ -1,0 +1,92 @@
+@startuml C4-Component-YaQuedo
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title C4 · Nivel 3 (Componentes) — YaQuedo API (Spring Boot)
+
+ContainerDb(db, "Base de Datos", "PostgreSQL", "Almacena cuentas de los usuarios, servicios y resenas")
+System_Ext(emailApi, "EMAIL API", "Permite validar la verificacion del correo del usuario")
+System_Ext(osmApi, "OpenStreetMap API", "Provee servicios de mapas, ubicacion y geolocalizacion")
+System_Ext(aiApi, "AI API", "Realiza recomendaciones que utilizan criterios historicos y caracteristicas")
+
+Container_Boundary(notification, "notification") {
+    Component(notificationService, "NotificationService", "Component: Spring Service", "Gestiona envio de notificaciones y correos")
+    Component(emailSenderClient, "EmailSenderClient", "Component: JSON/HTTP Client", "Consume servicio externo de envio de correos")
+}
+
+Container_Boundary(auth, "auth") {
+    Component(authController, "AuthController", "Component: REST Controller", "Gestiona el registro, login y validacion de usuarios")
+    Component(userService, "UserService", "Component: Spring Service", "Reglas de negocio para autenticacion y seguridad")
+    Component(emailVerificationClient, "EmailVerificationClient", "Component: JSON/HTTP Client", "Consume correos contra el validador de datos")
+    Component(userRepository, "UserRepository", "Component: Spring Data JPA", "Accede a los datos de usuarios registrados")
+}
+
+Container_Boundary(client, "client") {
+    Component(clientController, "ClientController", "Component: REST Controller", "Gestiona operaciones del cliente urbano")
+    Component(clientService, "ClientService", "Component: Spring Service", "Gestiona reglas de negocio del cliente")
+    Component(clientRepository, "ClientRepository", "Component: Spring Data JPA", "Accede a datos de clientes")
+}
+
+Container_Boundary(worker, "worker") {
+    Component(workerController, "WorkerController", "Component: REST Controller", "Gestiona trabajadores y servicios ofrecidos")
+    Component(workerService, "WorkerService", "Component: Spring Service", "Administra logica de negocio de trabajadores")
+    Component(workerRepository, "WorkerRepository", "Component: Spring Data JPA", "Accede a datos de trabajadores registrados")
+}
+
+Container_Boundary(matching, "matching") {
+    Component(matchingService, "MatchingService", "Component: Spring Service", "Recomienda trabajadores en funcion de la solicitud y la cercania")
+    Component(recommendationEngine, "RecommendationEngine", "Component: AI Recommendation engine", "Calcula afinidad entre solicitud y trabajadores")
+}
+
+Container_Boundary(request, "request") {
+    Component(requestController, "RequestController", "Component: REST Controller", "Gestiona solicitudes de servicio")
+    Component(requestService, "RequestService", "Component: Spring Service", "Gestiona logica de solicitudes y seguimiento")
+    Component(requestRepository, "RequestRepository", "Component: Spring Data JPA", "Accede a datos de solicitudes")
+}
+
+Container_Boundary(location, "location") {
+    Component(locationController, "LocationController", "Component: REST Controller", "Gestiona consultas geograficas en mapas")
+    Component(locationService, "LocationService", "Component: Spring Service", "Procesa coordenadas y distancia geografica")
+    Component(openStreetMapClient, "OpenStreetMapClient", "Component: JSON/HTTP Client", "Consume servicio de OpenStreetMap")
+}
+
+Container_Boundary(aiAssistant, "ai-assistant") {
+    Component(aiController, "AIController", "Component: REST Controller", "Recibe consultas del asistente virtual")
+    Component(aiService, "AIService", "Component: Spring Service", "Procesa consultas y genera respuestas inteligentes")
+    Component(aiClient, "AIClient", "Component: JSON/HTTP Client", "Consume servicio externo de IA")
+}
+
+Rel(notificationService, emailSenderClient, "envia mensajes y correos")
+Rel(emailSenderClient, emailApi, "envia correos de confirmacion")
+
+Rel(authController, userService, "delega")
+Rel(userService, userRepository, "consulta y persiste")
+Rel(userService, emailVerificationClient, "consulta y persiste")
+Rel(emailVerificationClient, emailApi, "envia solicitudes de verificacion", "JSON/HTTP")
+Rel(userRepository, db, "[JPA/SQL]")
+
+Rel(clientController, clientService, "delega perfil y solicitudes")
+Rel(clientService, clientRepository, "persiste")
+Rel(clientRepository, db, "[JPA/SQL]")
+
+Rel(workerController, workerService, "delega gestion trabajadores")
+Rel(workerService, workerRepository, "consulta disponibilidad y experiencia")
+Rel(workerRepository, db, "[JPA/SQL]")
+
+Rel(matchingService, workerService, "consulta trabajadores")
+Rel(matchingService, recommendationEngine, "logica de recomendacion")
+Rel(recommendationEngine, aiClient, "procesa recomendaciones inteligentes")
+
+Rel(requestController, requestService, "delega creacion y seguimiento")
+Rel(requestService, requestRepository, "persiste")
+Rel(requestService, matchingService, "solicita recomendacion trabajadores")
+Rel(requestRepository, db, "[JPA/SQL]")
+
+Rel(locationController, locationService, "delega procesamiento ubicacion")
+Rel(locationService, openStreetMapClient, "consulta mapas y geolocalizacion")
+Rel(openStreetMapClient, osmApi, "Consulta Ubicacion", "JSON/HTTP")
+
+Rel(aiController, aiService, "delega procesamiento conversacional")
+Rel(aiService, aiClient, "consulta modelo IA")
+Rel(aiClient, aiApi, "solicita recomendaciones", "JSON/HTTP")
+
+@enduml

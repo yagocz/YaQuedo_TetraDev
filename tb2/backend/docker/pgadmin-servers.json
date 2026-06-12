@@ -1,0 +1,14 @@
+{
+    "Servers": {
+        "1": {
+            "Name": "YaQuedo PostgreSQL",
+            "Group": "Servers",
+            "Host": "yaquedo-postgres",
+            "Port": 5432,
+            "MaintenanceDB": "yaquedo",
+            "Username": "yaquedo",
+            "PassFile": "/tmp/pgpass",
+            "SSLMode": "prefer"
+        }
+    }
+}

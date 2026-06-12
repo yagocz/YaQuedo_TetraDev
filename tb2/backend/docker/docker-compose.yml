@@ -1,0 +1,110 @@
+# =============================================================================
+# docker-compose.yml · YaQuedo TB2/TB3 (backend + postgres + pgadmin)
+#
+# Levantar:   docker compose up --build
+# Tumbar:     docker compose down
+# Reset BD:   docker compose down -v
+#
+# Servicios expuestos:
+#   - Frontend Angular      --> http://localhost:4200
+#   - Backend Spring Boot   --> http://localhost:8080
+#   - Swagger UI            --> http://localhost:8080/swagger-ui.html
+#   - pgAdmin (web GUI BD)  --> http://localhost:5050   (admin@yaquedo.pe / admin)
+#   - Postgres (driver)     --> localhost:5432           (yaquedo / yaquedo_local_pwd)
+# =============================================================================
+
+services:
+
+  yaquedo-postgres:
+    image: postgres:16-alpine
+    container_name: yaquedo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: yaquedo
+      POSTGRES_USER: yaquedo
+      POSTGRES_PASSWORD: yaquedo_local_pwd
+    ports:
+      - "5432:5432"
+    volumes:
+      - yaquedo_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yaquedo -d yaquedo"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - yaquedo-net
+
+  yaquedo-pgadmin:
+    image: dpage/pgadmin4:8
+    container_name: yaquedo-pgadmin
+    restart: unless-stopped
+    user: root
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@yaquedo.pe
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - yaquedo_pgadmin:/var/lib/pgadmin
+      - ./pgadmin-servers.json:/pgadmin4/servers.json:ro
+      - ./pgpass:/pgpass:ro
+    entrypoint: >
+      /bin/sh -c "
+      cp /pgpass /tmp/pgpass &&
+      chmod 600 /tmp/pgpass &&
+      chown pgadmin:root /tmp/pgpass &&
+      /entrypoint.sh
+      "
+    depends_on:
+      yaquedo-postgres:
+        condition: service_healthy
+    networks:
+      - yaquedo-net
+
+  yaquedo-backend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: yaquedo-backend
+    restart: unless-stopped
+    depends_on:
+      yaquedo-postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DB_URL: jdbc:postgresql://yaquedo-postgres:5432/yaquedo
+      DB_USER: yaquedo
+      DB_PASSWORD: yaquedo_local_pwd
+      JWT_SECRET: yaquedo-tb3-local-secret-please-change-min-32chars-totally
+      CORS_ALLOWED_ORIGINS: "http://localhost:4200,http://localhost:3000"
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+    ports:
+      - "8080:8080"
+    networks:
+      - yaquedo-net
+
+  yaquedo-frontend:
+    build:
+      context: ../../frontend/yaquedo-web
+      dockerfile: Dockerfile
+    container_name: yaquedo-frontend
+    restart: unless-stopped
+    depends_on:
+      - yaquedo-backend
+    ports:
+      - "4200:80"
+    networks:
+      - yaquedo-net
+
+volumes:
+  yaquedo_db:
+  yaquedo_pgadmin:
+
+networks:
+  yaquedo-net:
+    driver: bridge

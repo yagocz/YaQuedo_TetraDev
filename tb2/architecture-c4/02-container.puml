@@ -1,0 +1,29 @@
+@startuml C4-Container-YaQuedo
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title C4 · Nivel 2 (Contenedores) — YaQuedo
+
+Person(cliente, "Cliente", "Usuario que gestiona su cuenta y hace busquedas de tecnicos.")
+
+System_Boundary(yaquedo, "YaQuedo") {
+    Container(landing, "Landing Page", "HTML, CSS y JS", "Pagina de la presentacion de la plataforma.")
+    Container(frontend, "Frontend", "Angular / Angular Material (Framework)", "Interfaz web para busqueda y publicacion de servicios tecnicos.")
+    Container(api, "YaQuedo API - Spring Boot", "Spring Boot, Spring Data JPA, Spring Security, Java 21", "Autenticacion, logica de negocio, busquedas, contratacion y recompensas.")
+    ContainerDb(db, "Base de Datos", "PostgreSQL", "Almacena cuentas de los usuarios, servicios y resenas.")
+}
+
+System_Ext(osm, "OpenStreetMap", "Provee servicios de mapas, ubicacion y geolocalizacion.")
+System_Ext(smtp, "Gmail SMTP", "Permite validar la pertenencia del correo del usuario.")
+System_Ext(ia, "Servicio IA", "Asistente conversacional que permite consultar historial y realizar transferencias.")
+
+Rel(cliente, landing, "Visita la plataforma", "HTTPS")
+Rel(cliente, frontend, "Busca, Reserva o Publica Servicios")
+
+Rel(frontend, api, "API calls", "HTTP/JSON REST API")
+Rel(api, db, "Makes calls", "JPA/SQL")
+
+Rel(api, osm, "Consulta Ubicacion", "JSON/HTTP")
+Rel(api, smtp, "Consulta verificacion email", "JSON + HTTP(frontend & Spring Boot) SMTP")
+Rel(api, ia, "Consulta asistente", "JSON + HTTP")
+
+@enduml
