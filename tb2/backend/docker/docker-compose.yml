@@ -6,6 +6,7 @@
 # Reset BD:   docker compose down -v
 #
 # Servicios expuestos:
+#   - Frontend Angular      --> http://localhost:4200
 #   - Backend Spring Boot   --> http://localhost:8080
 #   - Swagger UI            --> http://localhost:8080/swagger-ui.html
 #   - pgAdmin (web GUI BD)  --> http://localhost:5050   (admin@yaquedo.pe / admin)
@@ -82,6 +83,19 @@ services:
       SMTP_PASS: ${SMTP_PASS:-}
     ports:
       - "8080:8080"
+    networks:
+      - yaquedo-net
+
+  yaquedo-frontend:
+    build:
+      context: ../../frontend/yaquedo-web
+      dockerfile: Dockerfile
+    container_name: yaquedo-frontend
+    restart: unless-stopped
+    depends_on:
+      - yaquedo-backend
+    ports:
+      - "4200:80"
     networks:
       - yaquedo-net
 

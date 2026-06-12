@@ -5,6 +5,7 @@ import com.tetradev.yaquedo.worker.dto.CategoriaServicioResponse;
 import com.tetradev.yaquedo.worker.dto.CreateTrabajadorRequest;
 import com.tetradev.yaquedo.worker.dto.TrabajadorResponse;
 import com.tetradev.yaquedo.worker.dto.TrabajadorSearchFilter;
+import com.tetradev.yaquedo.worker.dto.UpdateTrabajadorRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -17,4 +18,5 @@ public interface ITrabajadorService {
     TrabajadorResponse updateRating(UUID id, Double nuevoPromedio);
     TrabajadorResponse toggleDisponibilidad(UUID id);
     List<CategoriaServicioResponse> listCategorias();
+    TrabajadorResponse update(UUID id, UpdateTrabajadorRequest request);
 }

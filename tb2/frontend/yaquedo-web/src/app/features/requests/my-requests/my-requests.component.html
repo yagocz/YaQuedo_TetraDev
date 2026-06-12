@@ -1,0 +1,86 @@
+<div class="container">
+  <div class="header-row">
+    <h1 class="page-title">Mis solicitudes</h1>
+    <button mat-raised-button color="primary" routerLink="/trabajadores">
+      <mat-icon>add</mat-icon> Nueva solicitud
+    </button>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center mt-3">
+      <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+    </div>
+  } @else if (data().length === 0) {
+    <div class="empty-state">
+      <mat-icon style="font-size:48px;width:48px;height:48px;">inbox</mat-icon>
+      <h3>Aun no tienes solicitudes</h3>
+      <p>Cuando crees una solicitud aparecera aqui con su estado.</p>
+    </div>
+  } @else {
+    <mat-card>
+      <table mat-table [dataSource]="data()" class="full-width">
+
+        <ng-container matColumnDef="trabajador">
+          <th mat-header-cell *matHeaderCellDef>Trabajador</th>
+          <td mat-cell *matCellDef="let s">{{ s.trabajadorNombre }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="categoria">
+          <th mat-header-cell *matHeaderCellDef>Categoria</th>
+          <td mat-cell *matCellDef="let s">{{ s.categoriaNombre }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="fecha">
+          <th mat-header-cell *matHeaderCellDef>Fecha</th>
+          <td mat-cell *matCellDef="let s">{{ s.fechaServicio | date:'mediumDate' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="precio">
+          <th mat-header-cell *matHeaderCellDef>Precio</th>
+          <td mat-cell *matCellDef="let s">S/ {{ s.precioOfrecido }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="estado">
+          <th mat-header-cell *matHeaderCellDef>Estado</th>
+          <td mat-cell *matCellDef="let s">
+            <mat-chip [color]="badgeColor(s.estado)" highlighted>{{ s.estado }}</mat-chip>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="acciones">
+          <th mat-header-cell *matHeaderCellDef>Acciones</th>
+          <td mat-cell *matCellDef="let s">
+            @if (s.estado === 'PENDIENTE') {
+              @if (auth.isTrabajador()) {
+                <button mat-icon-button color="primary" (click)="aceptar(s)" matTooltip="Aceptar">
+                  <mat-icon>check</mat-icon>
+                </button>
+              }
+              <button mat-icon-button color="warn" (click)="cancelar(s)" matTooltip="Cancelar">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+            @if (s.estado === 'ACEPTADA' && auth.isTrabajador()) {
+              <button mat-icon-button color="accent" (click)="iniciar(s)" matTooltip="Iniciar">
+                <mat-icon>play_arrow</mat-icon>
+              </button>
+            }
+            @if (s.estado === 'EN_PROGRESO' && auth.isTrabajador()) {
+              <button mat-icon-button color="primary" (click)="finalizar(s)" matTooltip="Finalizar">
+                <mat-icon>flag</mat-icon>
+              </button>
+            }
+            @if (s.estado === 'FINALIZADA' && auth.isCliente()) {
+              <a mat-icon-button color="accent" [routerLink]="['/resenas/nueva', s.id]" matTooltip="Calificar">
+                <mat-icon>star</mat-icon>
+              </a>
+            }
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </mat-card>
+  }
+</div>

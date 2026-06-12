@@ -1,0 +1,46 @@
+<div class="container">
+  <mat-card class="review-card">
+    <mat-card-header>
+      <mat-card-title>Calificar el servicio</mat-card-title>
+      <mat-card-subtitle>Tu feedback ayuda a otros clientes</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="rating-block">
+          <p>Que tan satisfecho quedaste con el servicio?</p>
+          <div class="stars">
+            @for (n of stars(); track n) {
+              <button mat-icon-button type="button"
+                      (click)="setRating(n)"
+                      (mouseenter)="hoverRating.set(n)"
+                      (mouseleave)="hoverRating.set(0)">
+                <mat-icon class="star-icon" [class.active]="n <= (hoverRating() || form.controls.puntuacion.value)">
+                  star
+                </mat-icon>
+              </button>
+            }
+          </div>
+          <p class="rating-label">{{ form.controls.puntuacion.value }} / 5</p>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Comentario</mat-label>
+          <textarea matInput rows="5" formControlName="comentario"
+                    placeholder="Cuentanos como fue el servicio (puntualidad, calidad, trato...)"></textarea>
+          @if (form.controls.comentario.touched && form.controls.comentario.invalid) {
+            <mat-error>Comentario muy corto (minimo 10 caracteres)</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="actions">
+          <button mat-button type="button" routerLink="/solicitudes">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="saving()">
+            <mat-icon>send</mat-icon>
+            {{ saving() ? 'Enviando...' : 'Enviar resena' }}
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

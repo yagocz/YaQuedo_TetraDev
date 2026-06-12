@@ -6,6 +6,7 @@ import com.tetradev.yaquedo.worker.dto.CategoriaServicioResponse;
 import com.tetradev.yaquedo.worker.dto.CreateTrabajadorRequest;
 import com.tetradev.yaquedo.worker.dto.TrabajadorResponse;
 import com.tetradev.yaquedo.worker.dto.TrabajadorSearchFilter;
+import com.tetradev.yaquedo.worker.dto.UpdateTrabajadorRequest;
 import com.tetradev.yaquedo.worker.exception.TrabajadorYaExisteException;
 import com.tetradev.yaquedo.worker.mapper.TrabajadorMapper;
 import com.tetradev.yaquedo.worker.model.Trabajador;
@@ -78,5 +79,15 @@ public class TrabajadorService implements ITrabajadorService {
         return categoriaServicioRepository.findAll().stream()
                 .map(trabajadorMapper::toCategoriaResponse)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public TrabajadorResponse update(UUID id, UpdateTrabajadorRequest request) {
+        Trabajador t = trabajadorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "trabajador con id " + id + " no encontrado"));
+        trabajadorMapper.applyUpdate(request, t);
+        return trabajadorMapper.toResponse(trabajadorRepository.save(t));
     }
 }

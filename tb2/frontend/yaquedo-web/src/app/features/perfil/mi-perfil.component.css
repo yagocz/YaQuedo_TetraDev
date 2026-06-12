@@ -1,0 +1,12 @@
+.profile-card { padding: 16px; max-width: 720px; margin: 0 auto; }
+.info-card { max-width: 720px; margin: 0 auto; padding: 16px; }
+.avatar {
+  background: linear-gradient(135deg, #3f51b5, #ec407a);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.form { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.grow { flex: 1 1 200px; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }

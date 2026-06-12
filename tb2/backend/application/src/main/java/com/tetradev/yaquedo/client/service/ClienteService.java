@@ -2,6 +2,7 @@ package com.tetradev.yaquedo.client.service;
 
 import com.tetradev.yaquedo.client.dto.ClienteResponse;
 import com.tetradev.yaquedo.client.dto.CreateClienteRequest;
+import com.tetradev.yaquedo.client.dto.UpdateClienteRequest;
 import com.tetradev.yaquedo.client.exception.ClienteYaExisteException;
 import com.tetradev.yaquedo.client.mapper.ClienteMapper;
 import com.tetradev.yaquedo.client.model.Cliente;
@@ -51,5 +52,15 @@ public class ClienteService implements IClienteService {
     @Override
     public PageResponse<ClienteResponse> findAll(Pageable pageable) {
         return PageResponse.from(clienteRepository.findAll(pageable).map(clienteMapper::toResponse));
+    }
+
+    @Override
+    @Transactional
+    public ClienteResponse update(UUID id, UpdateClienteRequest request) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "cliente con id " + id + " no encontrado"));
+        clienteMapper.applyUpdate(request, cliente);
+        return clienteMapper.toResponse(clienteRepository.save(cliente));
     }
 }
