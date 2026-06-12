@@ -39,6 +39,10 @@ export const routes: Routes = [
       {
         path: 'resenas/nueva/:solicitudId',
         loadComponent: () => import('./features/reviews/review-form/review-form.component').then(m => m.ReviewFormComponent)
+      },
+      {
+        path: 'perfil',
+        loadComponent: () => import('./features/perfil/mi-perfil.component').then(m => m.MiPerfilComponent)
       }
     ]
   },

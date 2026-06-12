@@ -14,6 +14,10 @@
         <mat-icon matListItemIcon>assignment</mat-icon>
         <span matListItemTitle>Mis solicitudes</span>
       </a>
+      <a mat-list-item routerLink="/perfil" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>person</mat-icon>
+        <span matListItemTitle>Mi perfil</span>
+      </a>
       @if (auth.isCliente()) {
         <a mat-list-item routerLink="/trabajadores" routerLinkActive="active-link">
           <mat-icon matListItemIcon>add_circle</mat-icon>

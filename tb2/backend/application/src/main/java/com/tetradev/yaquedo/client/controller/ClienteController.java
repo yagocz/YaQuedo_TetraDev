@@ -2,6 +2,7 @@ package com.tetradev.yaquedo.client.controller;
 
 import com.tetradev.yaquedo.client.dto.ClienteResponse;
 import com.tetradev.yaquedo.client.dto.CreateClienteRequest;
+import com.tetradev.yaquedo.client.dto.UpdateClienteRequest;
 import com.tetradev.yaquedo.client.service.IClienteService;
 import com.tetradev.yaquedo.shared.pagination.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,5 +48,13 @@ public class ClienteController {
     public ResponseEntity<PageResponse<ClienteResponse>> findAll(
             @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(clienteService.findAll(pageable));
+    }
+
+    @Operation(summary = "Actualizar perfil del cliente (nombres, apellidos, telefono)")
+    @PatchMapping("/{id}")
+    public ResponseEntity<ClienteResponse> update(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateClienteRequest request) {
+        return ResponseEntity.ok(clienteService.update(id, request));
     }
 }

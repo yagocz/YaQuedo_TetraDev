@@ -65,4 +65,12 @@ public class TrabajadorController {
     public ResponseEntity<List<CategoriaServicioResponse>> listCategorias() {
         return ResponseEntity.ok(trabajadorService.listCategorias());
     }
+
+    @Operation(summary = "Actualizar perfil del trabajador (categoria, ubicacion, datos personales)")
+    @PatchMapping("/{id}")
+    public ResponseEntity<TrabajadorResponse> update(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateTrabajadorRequest request) {
+        return ResponseEntity.ok(trabajadorService.update(id, request));
+    }
 }
