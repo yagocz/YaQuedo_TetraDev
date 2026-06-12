@@ -1,53 +1,142 @@
-# YaQuedo Backend · TB2
+# Ya Quedo · Backend API
 
-Spring Boot 3.2 + Java 21 + PostgreSQL 16. Arquitectura **por capas** con 8 modulos.
-
-## Modulos
-
-| Modulo | Responsabilidad | Owner |
-|---|---|---|
-| `auth` | Registro, login, JWT, BCrypt | Jose Amaro |
-| `client` | Perfil de clientes | Jose Amaro |
-| `worker` | Trabajadores, categorias, busqueda, rating | Yago Caldas |
-| `request` | Solicitudes (state machine) + resenas | Austin Flores / Jose |
-| `matching` | Recomendaciones por categoria, rating, ubicacion | Austin Flores |
-| `location` | Geocoding y distancia via OpenStreetMap | Austin Flores |
-| `aiassistant` | Chat asistente Llama 3.3 via Groq | Austin Flores |
-| `notification` | Notificaciones internas + email SMTP | Jose Amaro |
-| `shared` | GlobalExceptionHandler, PageResponse, Security, OpenAPI | Equipo |
-
-## Patrones aplicados (lab PagoYa 05)
-
-- **DTOs como Java records** (Request / Response inmutables)
-- **MapStruct** para Entity <-> DTO
-- **Jakarta Bean Validation** (`@NotBlank`, `@Email`, `@Pattern`, etc.)
-- **GlobalExceptionHandler** + `ErrorResponse` uniforme
-- **PageResponse<T>** generico para listados paginados
+API REST de Ya Quedo, plataforma de contratacion de servicios tecnicos del hogar para Lima Metropolitana.
 
 ## Stack
 
-| Capa | Tecnologia |
-|---|---|
-| Lenguaje | Java 21 |
-| Framework | Spring Boot 3.2.5 |
-| DB | PostgreSQL 16 + Flyway |
-| Seguridad | Spring Security + JWT (jjwt 0.12) + BCrypt |
-| Mapping | MapStruct 1.6 + Lombok 1.18 |
-| Docs API | springdoc-openapi 2.5 (Swagger UI) |
-| Mail | spring-boot-starter-mail (SMTP) |
-| IA | Groq API (Llama 3.3 70B) via RestTemplate |
-| Geocoding | OpenStreetMap Nominatim via RestTemplate |
-| Build | Maven 3.9 |
-| Deploy | Docker Compose multi-stage |
+- Java 21
+- Spring Boot 3.2.5 + Spring Security
+- PostgreSQL 16 + Flyway
+- JWT (jjwt 0.12.5)
+- MapStruct, Lombok
+- springdoc-openapi (Swagger UI)
+- JUnit 5 + Mockito 5
 
-## Como correr localmente
+## Prerequisitos
+
+- Java 21
+- Maven 3.9+
+- Docker + Docker Compose (recomendado para BD local)
+
+## Como correr (modo local con Maven)
 
 ```bash
-cd tb2/backend/docker
+# 1) Levantar Postgres + pgAdmin
+cd docker
+docker compose up -d yaquedo-postgres yaquedo-pgadmin
+
+# 2) Compilar y arrancar la app
+cd ../application
+./mvnw spring-boot:run
+```
+
+La API queda en `http://localhost:8080`. Swagger UI: `http://localhost:8080/swagger-ui.html`.
+
+## Como correr (todo en Docker)
+
+```bash
+cd docker
 docker compose up --build
 ```
 
-Verifica:
-- Backend: http://localhost:8080
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- Postgres: localhost:5432 (user: `yaquedo`, pwd: `yaquedo_local_pwd`, db: `yaquedo`)
+Levanta 4 servicios:
+
+| Servicio | URL | Notas |
+|---|---|---|
+| Backend | http://localhost:8080 | Spring Boot |
+| Swagger UI | http://localhost:8080/swagger-ui.html | Documentacion interactiva |
+| pgAdmin | http://localhost:5050 | `admin@yaquedo.pe` / `admin` |
+| Postgres | localhost:5432 | `yaquedo` / `yaquedo_local_pwd` |
+| Frontend Angular | http://localhost:4200 | nginx + SPA |
+
+## Usuarios seed
+
+Todos con password `password123`:
+
+| Email | Rol |
+|---|---|
+| admin@yaquedo.pe | ADMIN |
+| ana@yaquedo.pe | CLIENTE |
+| luis@yaquedo.pe | TRABAJADOR (Gasfiteria) |
+| maria@yaquedo.pe | TRABAJADOR (Electricidad) |
+| carlos@yaquedo.pe | TRABAJADOR (Pintura) |
+
+## Endpoints principales (34 totales, 9 modulos)
+
+- `POST /api/auth/register` · `POST /api/auth/login`
+- `GET /api/workers` (paginado, filtros) · `GET /api/workers/{id}` · `PATCH /api/workers/{id}`
+- `GET /api/workers/categorias`
+- `POST /api/requests` · `GET /api/requests/cliente/{id}` · maquina de estados (`/aceptar`, `/rechazar`, `/iniciar`, `/finalizar`, `/cancelar`)
+- `POST /api/reviews` · `GET /api/reviews/trabajador/{id}/promedio`
+- `POST /api/matching/recomendar`
+- `POST /api/ai/chat`
+- `GET /api/location/geocode` · `GET /api/location/distance`
+- `GET /api/notifications/usuario/{id}` · `PATCH /api/notifications/{id}/leida`
+- `PATCH /api/clientes/{id}` (perfil cliente)
+
+## Testing
+
+```bash
+cd application
+./mvnw test
+```
+
+31 tests JUnit 5 + Mockito cubriendo las 11 User Stories del Sprint Backlog 2/3.
+
+## Postman
+
+Importar en Postman las dos colecciones del root del backend:
+
+- `yaquedo-api.postman_collection.json` (endpoints organizados en 9 carpetas)
+- `yaquedo-api.postman_environment.json` (variables locales)
+
+El request `Auth / Login` guarda automaticamente el JWT en la variable de coleccion.
+
+## Deploy (Render)
+
+`render.yaml` es un Render Blueprint que provisiona:
+
+- Base de datos Postgres 16 administrada (`yaquedo-db`)
+- Servicio web Docker (`yaquedo-api`) corriendo el Dockerfile
+
+Para deployar:
+
+1. En Render: `New → Blueprint` → conectar este repo → elegir `tb2/backend/render.yaml`
+2. Render aplica el blueprint automaticamente
+3. Variables a configurar manualmente en el dashboard tras el primer build:
+   - `CORS_ALLOWED_ORIGINS` = URL publica del frontend (ej. `https://yaquedo.vercel.app`)
+   - `GROQ_API_KEY` = API key de Groq (modulo AI, opcional)
+
+## Configuracion
+
+Profiles Spring:
+
+- `local` (default) — Postgres en localhost:5432
+- `prod` — DB via `DB_HOST/DB_PORT/DB_NAME/DB_USER/DB_PASSWORD` (Render Blueprint)
+
+## Estructura
+
+```
+tb2/backend/
+├── application/                       # Modulo Maven
+│   ├── pom.xml
+│   └── src/main/java/com/tetradev/yaquedo/
+│       ├── auth/                      # Registro + login + JWT
+│       ├── client/                    # CRUD cliente + perfil
+│       ├── worker/                    # CRUD trabajador + categorias + rating
+│       ├── request/                   # Solicitudes + reseñas
+│       ├── matching/                  # Recomendacion
+│       ├── location/                  # OpenStreetMap geocoding
+│       ├── notification/              # Persistencia + email SMTP
+│       ├── ai/                        # Groq chat completion
+│       ├── shared/                    # Config, exception handler, JWT filter
+│       └── YaquedoApplication.java
+├── docker/
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   ├── pgadmin-servers.json
+│   └── pgpass
+├── render.yaml                        # Render Blueprint
+├── yaquedo-api.postman_collection.json
+└── yaquedo-api.postman_environment.json
+```
