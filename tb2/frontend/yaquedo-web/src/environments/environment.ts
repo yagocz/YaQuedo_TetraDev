@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://yaquedo-api.onrender.com'
+  apiBaseUrl: 'https://yaquedotetradev-production.up.railway.app'
 };
