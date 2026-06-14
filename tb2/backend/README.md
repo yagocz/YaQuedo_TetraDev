@@ -92,20 +92,42 @@ Importar en Postman las dos colecciones del root del backend:
 
 El request `Auth / Login` guarda automaticamente el JWT en la variable de coleccion.
 
-## Deploy (Render)
+## Deploy
 
-`render.yaml` es un Render Blueprint que provisiona:
+### Opcion A — Railway (en uso para TB3)
 
-- Base de datos Postgres 16 administrada (`yaquedo-db`)
-- Servicio web Docker (`yaquedo-api`) corriendo el Dockerfile
+`railway.json` define el build via Dockerfile + healthcheck `/v3/api-docs`.
 
-Para deployar:
+Pasos en el dashboard de Railway:
+
+1. **New Project** → **Deploy from GitHub repo** → conectar `yagocz/YaQuedo_TetraDev`
+2. Settings del servicio:
+   - **Root Directory**: `tb2/backend`
+   - **Watch Paths**: `tb2/backend/**`
+   - Railway detecta `railway.json` y construye con `docker/Dockerfile`
+3. Agregar **Postgres**: dentro del proyecto → **+ Create** → **Database** → **Add PostgreSQL**
+4. Variables del servicio web (Variables tab):
+   - `SPRING_PROFILES_ACTIVE` = `prod`
+   - `DB_HOST` = `${{Postgres.PGHOST}}`
+   - `DB_PORT` = `${{Postgres.PGPORT}}`
+   - `DB_NAME` = `${{Postgres.PGDATABASE}}`
+   - `DB_USER` = `${{Postgres.PGUSER}}`
+   - `DB_PASSWORD` = `${{Postgres.PGPASSWORD}}`
+   - `JWT_SECRET` = generar con `openssl rand -base64 48`
+   - `CORS_ALLOWED_ORIGINS` = `https://ya-quedo.vercel.app`
+   - `PORT` = inyectado automatico por Railway
+5. Generar dominio publico: Settings → **Networking** → **Generate Domain**
+6. Deploy → URL final algo como `https://yaquedo-backend-production.up.railway.app`
+
+### Opcion B — Render (alternativa con Blueprint)
+
+`render.yaml` es un Render Blueprint que provisiona DB + Web Service en un click.
 
 1. En Render: `New → Blueprint` → conectar este repo → elegir `tb2/backend/render.yaml`
 2. Render aplica el blueprint automaticamente
-3. Variables a configurar manualmente en el dashboard tras el primer build:
-   - `CORS_ALLOWED_ORIGINS` = URL publica del frontend (ej. `https://yaquedo.vercel.app`)
-   - `GROQ_API_KEY` = API key de Groq (modulo AI, opcional)
+3. Variables a configurar manualmente:
+   - `CORS_ALLOWED_ORIGINS` = URL publica del frontend
+   - `GROQ_API_KEY` = API key de Groq (opcional)
 
 ## Configuracion
 
