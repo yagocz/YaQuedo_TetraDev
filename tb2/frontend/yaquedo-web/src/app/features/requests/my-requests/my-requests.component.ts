@@ -13,6 +13,9 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { SolicitudService } from '../../../core/services/solicitud.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { PerfilService } from '../../../core/services/perfil.service';
+import { TrabajadorService } from '../../../core/services/trabajador.service';
+import { switchMap } from 'rxjs';
 import { EstadoSolicitud, SolicitudResponse } from '../../../core/models/solicitud.model';
 
 @Component({
@@ -36,6 +39,8 @@ import { EstadoSolicitud, SolicitudResponse } from '../../../core/models/solicit
 export class MyRequestsComponent implements OnInit {
   private readonly solicitudes = inject(SolicitudService);
   readonly auth = inject(AuthService);
+  private readonly perfil = inject(PerfilService);
+  private readonly trabajadorSvc = inject(TrabajadorService);
   private readonly snack = inject(MatSnackBar);
 
   loading = signal(true);
@@ -50,13 +55,27 @@ export class MyRequestsComponent implements OnInit {
     const user = this.auth.currentUser();
     if (!user) return;
     this.loading.set(true);
-    const obs = user.role === 'TRABAJADOR'
-      ? this.solicitudes.listPorTrabajador(user.id)
-      : this.solicitudes.listPorCliente(user.id);
-    obs.subscribe({
-      next: r => { this.data.set(r); this.loading.set(false); },
-      error: () => this.loading.set(false)
-    });
+
+    if (user.role === 'TRABAJADOR') {
+      this.trabajadorSvc.search({}).subscribe({
+        next: list => {
+          const me = list.find(t => t.usuarioId === user.id);
+          if (!me) { this.data.set([]); this.loading.set(false); return; }
+          this.solicitudes.listPorTrabajador(me.id).subscribe({
+            next: r => { this.data.set(r); this.loading.set(false); },
+            error: () => this.loading.set(false)
+          });
+        },
+        error: () => this.loading.set(false)
+      });
+    } else {
+      this.perfil.getClienteByUsuario(user.id).pipe(
+        switchMap(c => this.solicitudes.listPorCliente(c.id))
+      ).subscribe({
+        next: r => { this.data.set(r); this.loading.set(false); },
+        error: () => { this.data.set([]); this.loading.set(false); }
+      });
+    }
   }
 
   badgeColor(estado: EstadoSolicitud): string {
