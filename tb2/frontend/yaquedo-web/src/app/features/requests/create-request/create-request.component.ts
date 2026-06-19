@@ -15,6 +15,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { TrabajadorService } from '../../../core/services/trabajador.service';
 import { SolicitudService } from '../../../core/services/solicitud.service';
+import { PerfilService } from '../../../core/services/perfil.service';
+import { AuthService } from '../../../core/services/auth.service';
 import { CategoriaServicio } from '../../../core/models/trabajador.model';
 
 @Component({
@@ -42,10 +44,13 @@ export class CreateRequestComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly trabajadores = inject(TrabajadorService);
   private readonly solicitudes = inject(SolicitudService);
+  private readonly perfil = inject(PerfilService);
+  private readonly auth = inject(AuthService);
   private readonly snack = inject(MatSnackBar);
 
   categorias = signal<CategoriaServicio[]>([]);
   saving = signal(false);
+  clienteId = signal<string | null>(null);
 
   paso1 = this.fb.nonNullable.group({
     trabajadorId: ['', Validators.required],
@@ -53,7 +58,7 @@ export class CreateRequestComponent implements OnInit {
   });
 
   paso2 = this.fb.nonNullable.group({
-    descripcion: ['', [Validators.required, Validators.minLength(15)]],
+    descripcion: ['', [Validators.required, Validators.minLength(15), Validators.maxLength(500)]],
     fechaServicio: [new Date(), Validators.required],
     direccion: ['', Validators.required]
   });
@@ -67,6 +72,16 @@ export class CreateRequestComponent implements OnInit {
     const categoriaId = this.route.snapshot.queryParamMap.get('categoriaId') ?? '';
     this.paso1.patchValue({ trabajadorId, categoriaId });
     this.trabajadores.listCategorias().subscribe(c => this.categorias.set(c));
+
+    const user = this.auth.currentUser();
+    if (user) {
+      this.perfil.getClienteByUsuario(user.id).subscribe({
+        next: c => this.clienteId.set(c.id),
+        error: () => {
+          this.snack.open('Tu cuenta aun no tiene perfil de cliente. Crea tu perfil en Mi Perfil antes de solicitar.', 'Cerrar', { duration: 5000 });
+        }
+      });
+    }
   }
 
   confirmar(): void {
@@ -74,13 +89,21 @@ export class CreateRequestComponent implements OnInit {
       this.snack.open('Completa todos los pasos del formulario', 'Cerrar', { duration: 3000 });
       return;
     }
+    const cid = this.clienteId();
+    if (!cid) {
+      this.snack.open('No se pudo resolver tu perfil de cliente. Vuelve a iniciar sesion.', 'Cerrar', { duration: 4000 });
+      return;
+    }
+
     this.saving.set(true);
     const body = {
-      ...this.paso1.getRawValue(),
-      ...this.paso2.getRawValue(),
-      ...this.paso3.getRawValue(),
-      fechaServicio: this.paso2.controls.fechaServicio.value.toISOString()
+      clienteId: cid,
+      trabajadorId: this.paso1.controls.trabajadorId.value,
+      descripcion: this.paso2.controls.descripcion.value,
+      fechaProgramada: this.paso2.controls.fechaServicio.value.toISOString(),
+      precioAcordado: this.paso3.controls.precioOfrecido.value
     };
+
     this.solicitudes.create(body).subscribe({
       next: () => {
         this.snack.open('Solicitud enviada al trabajador', 'Cerrar', { duration: 3000 });
@@ -89,7 +112,7 @@ export class CreateRequestComponent implements OnInit {
       error: (err) => {
         this.saving.set(false);
         const msg = err?.error?.message ?? 'No se pudo crear la solicitud';
-        this.snack.open(msg, 'Cerrar', { duration: 3000 });
+        this.snack.open(msg, 'Cerrar', { duration: 4000 });
       }
     });
   }
